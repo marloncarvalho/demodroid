@@ -65,9 +65,7 @@ public class SQLitePersistence implements Persistence {
 	 */
 	public void delete(Long id, Class<?> cls) {
 		SQLiteDatabase db = opener.getWritableDatabase();
-		db.beginTransaction();
 		db.delete(persistenceInspector.getTableName(cls), "id=?", new String[] { id.toString() });
-		db.endTransaction();
 		db.close();
 	}
 
