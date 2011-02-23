@@ -47,14 +47,13 @@ final public class PersistenceInspector {
 	 * @return
 	 */
 	public <T> Field getIdField(Class<T> cls) {
-		Field idfield = null;
-		for (Field field : cls.getDeclaredFields()) {
-			if (field.isAnnotationPresent(Id.class)) {
-				idfield = field;
-				break;
-			}
+		try {
+			return cls.getDeclaredField("id");
+		} catch (SecurityException e) {
+			throw new RuntimeException(e);
+		} catch (NoSuchFieldException e) {
+			throw new RuntimeException(e);
 		}
-		return idfield;
 	}
 
 	/**

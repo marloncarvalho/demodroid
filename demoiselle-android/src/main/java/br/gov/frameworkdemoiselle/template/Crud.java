@@ -39,15 +39,15 @@ package br.gov.frameworkdemoiselle.template;
 import java.io.Serializable;
 import java.util.List;
 
-public interface Crud<T, I> extends Serializable {
+public interface Crud<T> extends Serializable {
 
-	void delete(I id);
+	void delete(long id);
 
 	List<T> findAll();
 
 	void insert(T bean);
 
-	T load(I id);
+	T find(long id);
 
 	void update(T bean);
 
