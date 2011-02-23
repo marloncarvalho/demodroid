@@ -113,6 +113,30 @@ public class Reflections {
 		}
 	}
 
+	public static void setFieldValue(final String f, final Object object, final Object value) {
+		try {
+			Field field = object.getClass().getDeclaredField(f);
+			boolean acessible = field.isAccessible();
+			field.setAccessible(true);
+			field.set(object, value);
+			field.setAccessible(acessible);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static <T> T instantiate(Class<T> cls) {
+		T o = null;
+		try {
+			o = cls.newInstance();
+		} catch (InstantiationException e) {
+			throw new RuntimeException(e);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+		return o;
+	}
+	
 	public static Field[] getNonStaticDeclaredFields(Class<?> type) {
 		List<Field> fields = new ArrayList<Field>();
 
