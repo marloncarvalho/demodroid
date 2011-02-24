@@ -102,6 +102,21 @@ public class Reflections {
 		return result;
 	}
 
+	public static Object getFieldValue(String sField, Object object) {
+		Object result = null;
+		try {
+			Field field = object.getClass().getDeclaredField(sField);
+			boolean acessible = field.isAccessible();
+			field.setAccessible(true);
+			result = field.get(object);
+			field.setAccessible(acessible);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+
+		return result;
+	}
+
 	public static void setFieldValue(Field field, Object object, Object value) {
 		try {
 			boolean acessible = field.isAccessible();

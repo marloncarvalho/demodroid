@@ -127,14 +127,15 @@ public class Persistence<E> implements Crud<E> {
 		open();
 		Log.d("Persistence", "Updating object");
 		ContentValues values = getContentValues(object);
-		mDb.update(table, values, "id=?", new String[] { values.getAsString("id") });
+		long id = (Long)Reflections.getFieldValue("id", object);
+		mDb.update(table, values, "id=?", new String[] { String.valueOf(id) });
 		close();
 	}
 
 	public E find(long id) {
 		open();
 		E object = Reflections.instantiate(clasz);
-		Cursor cursor = mDb.query(table, null, "id=" + id, new String[] { String.valueOf(id) }, null, null, null);
+		Cursor cursor = mDb.query(table, null, "id=?", new String[] { String.valueOf(id) }, null, null, null);
 		Field[] fields = object.getClass().getDeclaredFields();
 		if (cursor.moveToFirst()) {
 			for (Field field : fields) {
