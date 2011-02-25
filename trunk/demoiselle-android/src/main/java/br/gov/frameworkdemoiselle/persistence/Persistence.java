@@ -26,7 +26,7 @@ public class Persistence<E> implements Crud<E> {
 	private static String database;
 	private static int version;
 	private DatabaseHelper mDbHelper;
-	private SQLiteDatabase mDb;
+	protected SQLiteDatabase mDb;
 	private static String createDDL;
 	private Class<E> clasz;
 
