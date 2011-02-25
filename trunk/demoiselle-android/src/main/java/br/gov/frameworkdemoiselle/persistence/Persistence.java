@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import br.gov.frameworkdemoiselle.annotation.Transient;
 import br.gov.frameworkdemoiselle.internal.persistence.SQLBuilder;
 import br.gov.frameworkdemoiselle.persistence.annotation.Database;
 import br.gov.frameworkdemoiselle.persistence.annotation.Id;
@@ -88,7 +89,7 @@ public class Persistence<E> implements Crud<E> {
 		ContentValues initialValues = new ContentValues();
 		for (Field field : fields) {
 			try {
-				if (!field.isAnnotationPresent(Id.class)) {
+				if (!field.isAnnotationPresent(Id.class) && !field.isAnnotationPresent(Transient.class)) {
 					initialValues.put(field.getName(), field.get(object).toString());
 				}
 			} catch (IllegalArgumentException e) {
@@ -127,7 +128,7 @@ public class Persistence<E> implements Crud<E> {
 		open();
 		Log.d("Persistence", "Updating object");
 		ContentValues values = getContentValues(object);
-		long id = (Long)Reflections.getFieldValue("id", object);
+		long id = (Long) Reflections.getFieldValue("id", object);
 		mDb.update(table, values, "id=?", new String[] { String.valueOf(id) });
 		close();
 	}
