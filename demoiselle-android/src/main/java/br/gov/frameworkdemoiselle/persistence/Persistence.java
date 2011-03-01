@@ -2,6 +2,7 @@ package br.gov.frameworkdemoiselle.persistence;
 
 import java.lang.reflect.Field;
 import java.util.AbstractList;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -14,12 +15,14 @@ import br.gov.frameworkdemoiselle.internal.persistence.PersistenceManager;
 import br.gov.frameworkdemoiselle.persistence.annotation.Id;
 import br.gov.frameworkdemoiselle.persistence.annotation.Table;
 import br.gov.frameworkdemoiselle.template.Crud;
+import br.gov.frameworkdemoiselle.util.DateUtils;
 import br.gov.frameworkdemoiselle.util.Reflections;
 
 import com.google.inject.Inject;
 
 public class Persistence<E> implements Crud<E> {
 	private static final long serialVersionUID = 1L;
+	private static final String DATE_FORMAT = "dd/MM/yyyy hh:mm:ss";
 	private String table;
 	private Class<E> clasz;
 
@@ -28,7 +31,7 @@ public class Persistence<E> implements Crud<E> {
 
 	@Inject
 	private PersistenceInspector inspector;
-	
+
 	public Persistence() {
 		clasz = Reflections.getGenericTypeArgument(this.getClass(), 0);
 		getAnnotations();
@@ -52,7 +55,9 @@ public class Persistence<E> implements Crud<E> {
 				if (!field.isAnnotationPresent(Id.class) && !field.isAnnotationPresent(Transient.class)) {
 					Object value = field.get(object);
 					String resValue = null;
-					if (value != null) {
+					if (value != null && value instanceof Date) {
+						resValue = DateUtils.format((Date)value, DATE_FORMAT);
+					} else if (value != null) {
 						resValue = value.toString();
 					}
 					initialValues.put(field.getName(), resValue);
@@ -129,7 +134,7 @@ public class Persistence<E> implements Crud<E> {
 			o = cursor.getShort(idx);
 		}
 		if (field.getType().getSimpleName().toLowerCase().equals("date")) {
-			o = cursor.getString(idx);
+			o = DateUtils.format(cursor.getString(idx), DATE_FORMAT);
 		}
 		if (field.getType().getSimpleName().toLowerCase().equals("int")) {
 			o = cursor.getInt(idx);
