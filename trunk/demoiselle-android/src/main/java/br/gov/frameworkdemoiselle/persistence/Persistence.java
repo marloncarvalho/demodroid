@@ -5,83 +5,43 @@ import java.util.AbstractList;
 import java.util.List;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import br.gov.frameworkdemoiselle.annotation.Transient;
-import br.gov.frameworkdemoiselle.internal.persistence.SQLBuilder;
-import br.gov.frameworkdemoiselle.persistence.annotation.Database;
+import br.gov.frameworkdemoiselle.internal.persistence.PersistenceInspector;
+import br.gov.frameworkdemoiselle.internal.persistence.PersistenceManager;
 import br.gov.frameworkdemoiselle.persistence.annotation.Id;
 import br.gov.frameworkdemoiselle.persistence.annotation.Table;
 import br.gov.frameworkdemoiselle.template.Crud;
 import br.gov.frameworkdemoiselle.util.Reflections;
 
 import com.google.inject.Inject;
-import com.google.inject.Provider;
 
 public class Persistence<E> implements Crud<E> {
 	private static final long serialVersionUID = 1L;
-	private static String table;
-	private static String database;
-	private static int version;
-	private DatabaseHelper mDbHelper;
-	protected SQLiteDatabase mDb;
-	private static String createDDL;
+	private String table;
 	private Class<E> clasz;
 
 	@Inject
-	private SQLBuilder builder;
+	private PersistenceManager persistenceManager;
 
 	@Inject
-	private Provider<Context> provider;
-
-	private class DatabaseHelper extends SQLiteOpenHelper {
-
-		DatabaseHelper(Context context) {
-			super(context, database, null, version);
-		}
-
-		@Override
-		public void onCreate(SQLiteDatabase db) {
-			if (createDDL == null || "".equals(createDDL)) {
-				createDDL = builder.buildCreateTable(clasz);
-			}
-			db.execSQL(createDDL);
-		}
-
-		@Override
-		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-			Log.w("Persistence", "Upgrading database from version " + oldVersion + " to " + newVersion
-					+ ", which will destroy all old data");
-			db.execSQL("DROP TABLE IF EXISTS " + table);
-			onCreate(db);
-		}
-	}
-
+	private PersistenceInspector inspector;
+	
 	public Persistence() {
 		clasz = Reflections.getGenericTypeArgument(this.getClass(), 0);
 		getAnnotations();
+	}
+
+	public SQLiteDatabase getDatabase() {
+		return getPersistenceManager().getDatabase();
 	}
 
 	private void getAnnotations() {
 		if (clasz.isAnnotationPresent(Table.class)) {
 			table = clasz.getAnnotation(Table.class).name();
 		}
-		if (clasz.isAnnotationPresent(Database.class)) {
-			database = clasz.getAnnotation(Database.class).name();
-			version = clasz.getAnnotation(Database.class).version();
-		}
-	}
-
-	public Persistence<E> open() {
-		if (mDbHelper == null || !mDb.isOpen()) {
-			Log.d("Persistence", "Opening Database: " + database);
-			mDbHelper = new DatabaseHelper(provider.get());
-			mDb = mDbHelper.getWritableDatabase();
-		}
-		return this;
 	}
 
 	private ContentValues getContentValues(E object) {
@@ -90,7 +50,12 @@ public class Persistence<E> implements Crud<E> {
 		for (Field field : fields) {
 			try {
 				if (!field.isAnnotationPresent(Id.class) && !field.isAnnotationPresent(Transient.class)) {
-					initialValues.put(field.getName(), field.get(object).toString());
+					Object value = field.get(object);
+					String resValue = null;
+					if (value != null) {
+						resValue = value.toString();
+					}
+					initialValues.put(field.getName(), resValue);
 				}
 			} catch (IllegalArgumentException e) {
 				Log.e("Persistence", e.getMessage());
@@ -103,40 +68,34 @@ public class Persistence<E> implements Crud<E> {
 		return initialValues;
 	}
 
-	public boolean close() {
-		Log.d("Persistence", "Closing database");
-		mDb.close();
-		return true;
-	}
-
 	public void insert(E object) {
-		open();
 		Log.d("Persistence", "Inserting object");
-		long id = mDb.insertOrThrow(table, null, getContentValues(object));
+		getPersistenceManager().open();
+		long id = getPersistenceManager().getDatabase().insertOrThrow(table, null, getContentValues(object));
+		getPersistenceManager().close();
 		Reflections.setFieldValue("id", object, id);
-		close();
 	}
 
 	public void delete(long id) {
-		open();
 		Log.d("Persistence", "Deleting object");
-		mDb.delete(table, "id=" + id, null);
-		close();
+		getPersistenceManager().open();
+		getPersistenceManager().getDatabase().delete(table, "id=" + id, null);
+		getPersistenceManager().close();
 	}
 
 	public void update(E object) {
-		open();
 		Log.d("Persistence", "Updating object");
 		ContentValues values = getContentValues(object);
 		long id = (Long) Reflections.getFieldValue("id", object);
-		mDb.update(table, values, "id=?", new String[] { String.valueOf(id) });
-		close();
+		getPersistenceManager().open();
+		getPersistenceManager().getDatabase().update(table, values, "id=?", new String[] { String.valueOf(id) });
+		getPersistenceManager().close();
 	}
 
 	public E find(long id) {
-		open();
 		E object = Reflections.instantiate(clasz);
-		Cursor cursor = mDb.query(table, null, "id=?", new String[] { String.valueOf(id) }, null, null, null);
+		Cursor cursor = getPersistenceManager().getDatabase().query(table, null, "id=?",
+				new String[] { String.valueOf(id) }, null, null, null);
 		Field[] fields = object.getClass().getDeclaredFields();
 		if (cursor.moveToFirst()) {
 			for (Field field : fields) {
@@ -144,13 +103,13 @@ public class Persistence<E> implements Crud<E> {
 			}
 		}
 		cursor.close();
-		close();
 		return object;
 	}
 
 	public List<E> findAll() {
-		open();
-		List<E> list = new CursorList(mDb.query(table, null, null, null, null, null, null));
+		getPersistenceManager().open();
+		List<E> list = new CursorList(getPersistenceManager().getDatabase().query(table, null, null, null, null, null,
+				null));
 		return list;
 	}
 
@@ -169,13 +128,27 @@ public class Persistence<E> implements Crud<E> {
 		if (field.getType().getSimpleName().toLowerCase().equals("short")) {
 			o = cursor.getShort(idx);
 		}
+		if (field.getType().getSimpleName().toLowerCase().equals("date")) {
+			o = cursor.getString(idx);
+		}
 		if (field.getType().getSimpleName().toLowerCase().equals("int")) {
 			o = cursor.getInt(idx);
 		}
 		if (field.getType().getSimpleName().toLowerCase().equals("long")) {
 			o = cursor.getLong(idx);
 		}
+		if (field.getType().getSimpleName().toLowerCase().equals("boolean")) {
+			o = cursor.getInt(idx) == 1 ? Boolean.TRUE : Boolean.FALSE;
+		}
 		return o;
+	}
+
+	public void setPersistenceManager(PersistenceManager persistenceManager) {
+		this.persistenceManager = persistenceManager;
+	}
+
+	public PersistenceManager getPersistenceManager() {
+		return persistenceManager;
 	}
 
 	public class CursorList extends AbstractList<E> {
@@ -189,7 +162,7 @@ public class Persistence<E> implements Crud<E> {
 		public E get(int index) {
 			E object = null;
 			if (cursor.moveToPosition(index)) {
-				Field[] fields = clasz.getDeclaredFields();
+				List<Field> fields = inspector.getPersistentFields(clasz);
 				try {
 					object = clasz.newInstance();
 				} catch (InstantiationException e1) {
