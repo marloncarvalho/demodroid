@@ -9,8 +9,5 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value = { ElementType.TYPE })
-public @interface Database {
-
-	String name();
-	int version();
+public @interface Entity {
 }

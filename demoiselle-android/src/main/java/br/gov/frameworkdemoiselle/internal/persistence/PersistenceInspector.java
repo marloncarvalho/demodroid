@@ -2,6 +2,7 @@ package br.gov.frameworkdemoiselle.internal.persistence;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import br.gov.frameworkdemoiselle.annotation.Transient;
@@ -31,7 +32,8 @@ final public class PersistenceInspector {
 			if (!field.isAnnotationPresent(Transient.class)
 					&& !field.isAnnotationPresent(Id.class)) {
 				if (field.getType().isPrimitive()
-						|| field.getType().equals(String.class)) {
+						|| field.getType().equals(String.class)
+						|| field.getType().equals(Date.class)) {
 					list.add(field);
 				}
 			}

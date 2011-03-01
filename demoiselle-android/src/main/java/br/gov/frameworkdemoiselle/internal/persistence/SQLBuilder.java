@@ -29,10 +29,13 @@ public class SQLBuilder {
 
 	private String getType(Class<?> cls) {
 		String type = null;
+		if (cls.getSimpleName().toLowerCase().equals("date")) {
+			type = "DATE";
+		}
 		if (cls.getSimpleName().toLowerCase().equals("string")) {
 			type = "TEXT";
 		}
-		if (cls.getSimpleName().toLowerCase().equals("integer")) {
+		if (cls.getSimpleName().toLowerCase().equals("integer") || cls.getSimpleName().toLowerCase().equals("boolean")) {
 			type = "INTEGER";
 		}
 		if (cls.getSimpleName().toLowerCase().equals("double")

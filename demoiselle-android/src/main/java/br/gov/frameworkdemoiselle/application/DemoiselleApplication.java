@@ -23,4 +23,9 @@ public class DemoiselleApplication extends RoboApplication {
 		super.onCreate();
 	}
 
+	@Override
+	public void onTerminate() {
+		super.onTerminate();
+	}
+
 }
