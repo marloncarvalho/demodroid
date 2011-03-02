@@ -1,6 +1,7 @@
 package br.gov.frameworkdemoiselle.internal.persistence;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +19,7 @@ import br.gov.frameworkdemoiselle.persistence.annotation.Table;
  */
 final public class PersistenceInspector {
 	private List<Class<?>> list = new ArrayList<Class<?>>();
-	
+
 	/**
 	 * Get all persistent field from a specific class.
 	 * 
@@ -29,12 +30,25 @@ final public class PersistenceInspector {
 	public <T> List<Field> getPersistentFields(Class<T> cls) {
 		List<Field> list = new ArrayList<Field>();
 		for (Field field : cls.getDeclaredFields()) {
-			if (!field.isAnnotationPresent(Transient.class)
-					&& !field.isAnnotationPresent(Id.class)) {
-				if (field.getType().isPrimitive()
-						|| field.getType().equals(String.class)
+			if (!field.isAnnotationPresent(Transient.class) && !field.isAnnotationPresent(Id.class)) {
+				if (field.getType().isPrimitive() || field.getType().equals(String.class)
 						|| field.getType().equals(Date.class)) {
 					list.add(field);
+				}
+			}
+		}
+		return list;
+	}
+
+	public <T> List<Field> getAllPersistentFields(Class<T> cls) {
+		List<Field> list = new ArrayList<Field>();
+		for (Field field : cls.getDeclaredFields()) {
+			if (!field.isAnnotationPresent(Transient.class)) {
+				if (field.getType().isPrimitive() || field.getType().equals(String.class)
+						|| field.getType().equals(Date.class)) {
+					if (!Modifier.isStatic(field.getModifiers())) {
+						list.add(field);
+					}
 				}
 			}
 		}
@@ -82,8 +96,7 @@ final public class PersistenceInspector {
 	 * @param config
 	 * @return
 	 */
-	public List<Class<?>> getEntities(ClassLoader classLoader,
-			InternalConfig config) {
+	public List<Class<?>> getEntities(ClassLoader classLoader, InternalConfig config) {
 		if (this.list.isEmpty()) {
 			String entities = config.getDomainClasses();
 			for (String str : entities.split(",")) {
