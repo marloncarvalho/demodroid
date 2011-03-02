@@ -22,7 +22,7 @@ import com.google.inject.Inject;
 
 public class Persistence<E> implements Crud<E> {
 	private static final long serialVersionUID = 1L;
-	private static final String DATE_FORMAT = "dd/MM/yyyy hh:mm:ss";
+	private static final String DATE_FORMAT = "dd/MM/yyyy HH:mm:ss";
 	private String table;
 	private Class<E> clasz;
 
@@ -167,7 +167,7 @@ public class Persistence<E> implements Crud<E> {
 		public E get(int index) {
 			E object = null;
 			if (cursor.moveToPosition(index)) {
-				List<Field> fields = inspector.getPersistentFields(clasz);
+				List<Field> fields = inspector.getAllPersistentFields(clasz);
 				try {
 					object = clasz.newInstance();
 				} catch (InstantiationException e1) {
