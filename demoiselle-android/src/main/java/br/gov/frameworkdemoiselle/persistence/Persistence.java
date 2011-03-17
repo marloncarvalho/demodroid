@@ -2,6 +2,7 @@ package br.gov.frameworkdemoiselle.persistence;
 
 import java.lang.reflect.Field;
 import java.util.AbstractList;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class Persistence<E> implements Crud<E> {
 	}
 
 	private ContentValues getContentValues(E object) {
-		Field[] fields = object.getClass().getDeclaredFields();
+		List<Field> fields = inspector.getAllPersistentFields(clasz);
 		ContentValues initialValues = new ContentValues();
 		for (Field field : fields) {
 			try {
@@ -56,7 +57,9 @@ public class Persistence<E> implements Crud<E> {
 					Object value = field.get(object);
 					String resValue = null;
 					if (value != null && value instanceof Date) {
-						resValue = DateUtils.format((Date)value, DATE_FORMAT);
+						resValue = DateUtils.format((Date) value, DATE_FORMAT);
+					} else if (value != null && value instanceof Boolean) {
+						resValue = ((Boolean) value).booleanValue() ? "1" : "0";
 					} else if (value != null) {
 						resValue = value.toString();
 					}
@@ -101,7 +104,7 @@ public class Persistence<E> implements Crud<E> {
 		E object = Reflections.instantiate(clasz);
 		Cursor cursor = getPersistenceManager().getDatabase().query(table, null, "id=?",
 				new String[] { String.valueOf(id) }, null, null, null);
-		Field[] fields = object.getClass().getDeclaredFields();
+		List<Field> fields = inspector.getAllPersistentFields(clasz);
 		if (cursor.moveToFirst()) {
 			for (Field field : fields) {
 				Reflections.setFieldValue(field, object, getValue(field, cursor));
@@ -156,45 +159,55 @@ public class Persistence<E> implements Crud<E> {
 		return persistenceManager;
 	}
 
+	/**
+	 * Special List.
+	 * 
+	 * @author Marlon
+	 * 
+	 */
 	public class CursorList extends AbstractList<E> {
-		private Cursor cursor;
+		private List<E> objects = new ArrayList<E>();
 
 		public CursorList(Cursor cursor) {
-			this.cursor = cursor;
-		}
-
-		@Override
-		public E get(int index) {
-			E object = null;
-			if (cursor.moveToPosition(index)) {
-				List<Field> fields = inspector.getAllPersistentFields(clasz);
-				try {
-					object = clasz.newInstance();
-				} catch (InstantiationException e1) {
-					Log.e("Persistence", e1.getMessage());
-					throw new RuntimeException(e1);
-				} catch (IllegalAccessException e1) {
-					Log.e("Persistence", e1.getMessage());
-					throw new RuntimeException(e1);
-				}
-				for (Field field : fields) {
+			if (cursor.moveToFirst()) {
+				while (cursor.isAfterLast() == false) {
+					E object = null;
+					List<Field> fields = inspector.getAllPersistentFields(clasz);
 					try {
-						field.set(object, getValue(field, cursor));
-					} catch (IllegalArgumentException e) {
-						Log.e("Persistence", e.getMessage());
-						throw new RuntimeException(e);
-					} catch (IllegalAccessException e) {
-						Log.e("Persistence", e.getMessage());
-						throw new RuntimeException(e);
+						object = clasz.newInstance();
+					} catch (InstantiationException e1) {
+						Log.e("Persistence", e1.getMessage());
+						throw new RuntimeException(e1);
+					} catch (IllegalAccessException e1) {
+						Log.e("Persistence", e1.getMessage());
+						throw new RuntimeException(e1);
 					}
+					for (Field field : fields) {
+						try {
+							field.set(object, getValue(field, cursor));
+						} catch (IllegalArgumentException e) {
+							Log.e("Persistence", e.getMessage());
+							throw new RuntimeException(e);
+						} catch (IllegalAccessException e) {
+							Log.e("Persistence", e.getMessage());
+							throw new RuntimeException(e);
+						}
+					}
+					cursor.moveToNext();
+					objects.add(object);
 				}
 			}
-			return object;
+			cursor.close();
+			persistenceManager.close();
+		}
+
+		public E get(int index) {
+			return objects.get(index);
 		}
 
 		@Override
 		public int size() {
-			return cursor.getCount();
+			return objects.size();
 		}
 
 	}

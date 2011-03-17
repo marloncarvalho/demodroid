@@ -33,7 +33,9 @@ final public class PersistenceInspector {
 			if (!field.isAnnotationPresent(Transient.class) && !field.isAnnotationPresent(Id.class)) {
 				if (field.getType().isPrimitive() || field.getType().equals(String.class)
 						|| field.getType().equals(Date.class)) {
-					list.add(field);
+					if (!Modifier.isStatic(field.getModifiers())) {
+						list.add(field);
+					}
 				}
 			}
 		}
