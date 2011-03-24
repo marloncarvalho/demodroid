@@ -16,12 +16,10 @@ import com.google.inject.spi.TypeListener;
 @SuppressWarnings("all")
 public class StartupBootstrap implements TypeListener, InjectionListener {
 	public static Set<Object> objects = new HashSet<Object>();
-	
+
 	@SuppressWarnings("unchecked")
-	public <I> void hear(TypeLiteral<I> typeLiteral,
-			TypeEncounter<I> typeEncounter) {
-		if (typeLiteral.getRawType().isAnnotationPresent(
-				BusinessController.class)) {
+	public <I> void hear(TypeLiteral<I> typeLiteral, TypeEncounter<I> typeEncounter) {
+		if (typeLiteral.getRawType().isAnnotationPresent(BusinessController.class)) {
 			typeEncounter.register(this);
 			Method[] methods = typeLiteral.getRawType().getMethods();
 			for (Method method : methods) {
@@ -34,7 +32,7 @@ public class StartupBootstrap implements TypeListener, InjectionListener {
 	}
 
 	public void afterInjection(Object o) {
-		if ( objects.contains(o) ) {
+		if (objects.contains(o)) {
 			return;
 		}
 		Method[] methods = o.getClass().getMethods();
