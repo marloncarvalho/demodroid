@@ -17,6 +17,18 @@ public class PersistenceManager {
 		this.databaseHelper = new DatabaseHelper(context.get());
 	}
 
+	public void startTransaction() {
+
+	}
+
+	public void commit() {
+
+	}
+
+	public void rollback() {
+
+	}
+
 	public SQLiteDatabase getDatabase() {
 		open();
 		return this.database;
