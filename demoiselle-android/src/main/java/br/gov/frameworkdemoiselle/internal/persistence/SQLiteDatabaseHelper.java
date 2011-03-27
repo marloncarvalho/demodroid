@@ -2,17 +2,21 @@ package br.gov.frameworkdemoiselle.internal.persistence;
 
 import java.util.ArrayList;
 
+import roboguice.event.EventManager;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import br.gov.frameworkdemoiselle.event.DatabaseCreation;
 import br.gov.frameworkdemoiselle.util.Dex;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
-public class DatabaseHelper extends SQLiteOpenHelper {
+@Singleton
+public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 	private static final String DATABASE = "DATABASE";
 	private static final String VERSION = "VERSION";
 	private Context context;
@@ -24,12 +28,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private PersistenceInspector inspector;
 
 	@Inject
-	public DatabaseHelper(Context context) {
+	private EventManager eventManager;
+
+	@Inject
+	public SQLiteDatabaseHelper(Context context) {
 		super(context, getDatabaseName(context), null, getDatabaseVersion(context));
 		this.context = context;
 	}
 
 	public void onCreate(SQLiteDatabase db) {
+		eventManager.fire(new DatabaseCreation(db));
 		ArrayList<Class<?>> tables = Dex.getEntities(this.context);
 		for (Class<?> table : tables) {
 			db.execSQL(sqlBuilder.buildCreateTable(table));

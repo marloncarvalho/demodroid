@@ -66,6 +66,12 @@ final public class PersistenceInspector {
 	 */
 	public <T> Field getIdField(Class<T> cls) {
 		try {
+			List<Field> fields = getAllPersistentFields(cls);
+			for (Field field : fields) {
+				if (field.isAnnotationPresent(Id.class)) {
+					return field;
+				}
+			}
 			return cls.getDeclaredField("id");
 		} catch (SecurityException e) {
 			throw new RuntimeException(e);
