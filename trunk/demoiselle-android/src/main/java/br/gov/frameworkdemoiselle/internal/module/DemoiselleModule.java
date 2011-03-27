@@ -17,11 +17,11 @@ public class DemoiselleModule extends AbstractAndroidModule {
 	protected void configure() {
 		bindListener(Matchers.any(), new ConfigurationBootstrap());
 		bindListener(Matchers.any(), new StartupBootstrap());
+//		bindListener(Matchers.subclassesOf(Transaction.class), new SQLiteTransaction());
 	}
 
 	@Provides
-	public ConfigurationProcessor provideConfigurationProcessor(
-			Provider<Context> provider) {
+	public ConfigurationProcessor provideConfigurationProcessor(Provider<Context> provider) {
 		if (this.configurationProcessor == null) {
 			this.configurationProcessor = new ConfigurationProcessor(provider);
 		}

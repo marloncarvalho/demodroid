@@ -10,23 +10,11 @@ public class PersistenceManager {
 	private SQLiteDatabase database;
 
 	@Inject
-	private DatabaseHelper databaseHelper;
+	private SQLiteDatabaseHelper databaseHelper;
 
 	@Inject
 	public PersistenceManager(Provider<Context> context) {
-		this.databaseHelper = new DatabaseHelper(context.get());
-	}
-
-	public void startTransaction() {
-
-	}
-
-	public void commit() {
-
-	}
-
-	public void rollback() {
-
+		this.databaseHelper = new SQLiteDatabaseHelper(context.get());
 	}
 
 	public SQLiteDatabase getDatabase() {
@@ -45,4 +33,5 @@ public class PersistenceManager {
 			this.database = null;
 		}
 	}
+
 }
