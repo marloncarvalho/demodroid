@@ -8,16 +8,20 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import br.gov.frameworkdemoiselle.internal.exception.SystemException;
 import br.gov.frameworkdemoiselle.internal.persistence.MappedColumn;
 import br.gov.frameworkdemoiselle.internal.persistence.MappedEntity;
 import br.gov.frameworkdemoiselle.internal.persistence.PersistenceInspector;
 import br.gov.frameworkdemoiselle.internal.persistence.SQLiteDatabaseHelper;
 import br.gov.frameworkdemoiselle.internal.persistence.column.BooleanColumn;
+import br.gov.frameworkdemoiselle.internal.persistence.column.DateColumn;
+import br.gov.frameworkdemoiselle.internal.persistence.column.DoubleColumn;
+import br.gov.frameworkdemoiselle.internal.persistence.column.FloatColumn;
+import br.gov.frameworkdemoiselle.internal.persistence.column.IntegerColumn;
+import br.gov.frameworkdemoiselle.internal.persistence.column.ShortColumn;
 import br.gov.frameworkdemoiselle.persistence.EntityManager;
 import br.gov.frameworkdemoiselle.persistence.Query;
-import br.gov.frameworkdemoiselle.persistence.annotation.Table;
-import br.gov.frameworkdemoiselle.util.DateUtils;
 import br.gov.frameworkdemoiselle.util.Reflections;
 
 import com.google.inject.Inject;
@@ -56,8 +60,22 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 * br.gov.frameworkdemoiselle.persistence.EntityManager#find(java.lang.Class
 	 * , java.lang.Object)
 	 */
+	@SuppressWarnings("unchecked")
 	public <T> T find(Class<T> clazz, Object primaryKey) throws SystemException {
-		return null;
+		MappedEntity mappedEntity = getMappedEntity(clazz);
+		Cursor cursor = databaseHelper.getWritableDatabase().query(mappedEntity.getTableName(), null, "id=?",
+				new String[] {}, null, null, null);
+
+		Object object = mappedEntity.instantiate();
+
+		if (cursor.moveToFirst()) {
+			for (MappedColumn mappedColumn : mappedEntity.getMappedColumns().values()) {
+				mappedColumn.setValue(object, cursor);
+			}
+		}
+
+		cursor.close();
+		return (T) object;
 	}
 
 	/*
@@ -100,14 +118,15 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 */
 	public void remove(Object object) throws SystemException {
 		MappedEntity mappedEntity = getMappedEntity(object);
-		Object idValue = Reflections.getFieldValue(mappedEntity.getIdField(), object);
+		MappedColumn idMappedColumn = mappedEntity.getIdMappedColumn();
+		Object idValue = idMappedColumn.getValue(object);
 		String id = "";
 		if (idValue != null) {
 			id = idValue.toString();
 		} else {
 			id = "0";
 		}
-		databaseHelper.getWritableDatabase().delete(mappedEntity.getTableName(), mappedEntity.getIdFieldName() + "=? ",
+		databaseHelper.getWritableDatabase().delete(mappedEntity.getTableName(), idMappedColumn.getName() + "=? ",
 				new String[] { id });
 	}
 
@@ -155,9 +174,15 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 		if (value instanceof Boolean || value.getClass().equals(boolean.class)) {
 			mappedColumn = new BooleanColumn();
 		} else if (value instanceof Date) {
-
-		} else {
-
+			mappedColumn = new DateColumn();
+		} else if (value instanceof Integer || value.getClass().equals(int.class)) {
+			mappedColumn = new IntegerColumn();
+		} else if (value instanceof Float || value.getClass().equals(float.class)) {
+			mappedColumn = new FloatColumn();
+		} else if (value instanceof Short || value.getClass().equals(short.class)) {
+			mappedColumn = new ShortColumn();
+		} else if (value instanceof Double || value.getClass().equals(double.class)) {
+			mappedColumn = new DoubleColumn();
 		}
 
 		mappedColumn.setField(field);

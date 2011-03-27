@@ -4,29 +4,22 @@ import android.database.Cursor;
 import br.gov.frameworkdemoiselle.internal.persistence.MappedColumn;
 import br.gov.frameworkdemoiselle.util.Reflections;
 
-public class BooleanColumn extends MappedColumn {
+public class IntegerColumn extends MappedColumn {
 
 	@Override
 	public String getValue(Object object) {
-		String resValue = null;
-		Object value = getRawValue(object);
-
-		if (value != null && value instanceof Boolean) {
-			resValue = ((Boolean) value).booleanValue() ? "1" : "0";
+		Object result = getRawValue(object);
+		if (result == null) {
+			result = "";
 		}
-
-		return resValue;
+		return result.toString();
 	}
 
 	@Override
 	public void setValue(Object object, Cursor cursor) {
 		int index = cursor.getColumnIndex(getName());
 		int value = cursor.getInt(index);
-		boolean result = false;
-		if (value == 1) {
-			result = true;
-		}
-		Reflections.setFieldValue(field, object, result);
+		Reflections.setFieldValue(field, object, value);
 	}
 
 }

@@ -12,8 +12,9 @@ public class DateColumn extends MappedColumn {
 	public static final String DATE_FORMAT = "MM/dd/yyyy HH:mm:ss";
 
 	@Override
-	public String getValue(Object value) {
+	public String getValue(Object object) {
 		String resValue = null;
+		Object value = getRawValue(object);
 
 		if (value != null && value instanceof Boolean) {
 			resValue = DateUtils.format((Date) value, DATE_FORMAT);
