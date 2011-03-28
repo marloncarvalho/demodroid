@@ -16,6 +16,6 @@ public interface EntityManager {
 
 	void remove(Object object) throws SystemException;
 
-	Query createQuery(String query);
+	Query createQuery(Class<?> clazz, String query); 
 
 }

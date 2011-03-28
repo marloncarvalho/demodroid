@@ -12,4 +12,6 @@ public interface Query {
 
 	List<?> getResultList();
 
+	Object getRawResult();
+
 }
