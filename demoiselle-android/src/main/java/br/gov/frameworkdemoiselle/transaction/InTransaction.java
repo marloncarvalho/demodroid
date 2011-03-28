@@ -1,4 +1,4 @@
-package br.gov.frameworkdemoiselle.persistence;
+package br.gov.frameworkdemoiselle.transaction;
 
 public interface InTransaction {
 
