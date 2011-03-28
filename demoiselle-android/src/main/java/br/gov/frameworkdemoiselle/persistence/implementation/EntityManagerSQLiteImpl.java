@@ -57,6 +57,27 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 * (non-Javadoc)
 	 * 
 	 * @see
+	 * br.gov.frameworkdemoiselle.persistence.EntityManager#merge(java.lang.
+	 * Object)
+	 */
+	public void merge(Object object) throws SystemException {
+		MappedEntity mappedEntity = getMappedEntity(object);
+		MappedColumn idMappedColumn = mappedEntity.getIdMappedColumn();
+		Object idValue = idMappedColumn.getValue(object);
+		String id = "";
+		if (idValue != null) {
+			id = idValue.toString();
+		} else {
+			id = "0";
+		}
+		databaseHelper.getWritableDatabase().update(mappedEntity.getTableName(),
+				createContentValues(mappedEntity, object), idMappedColumn.getName() + "=? ", new String[] { id });
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
 	 * br.gov.frameworkdemoiselle.persistence.EntityManager#find(java.lang.Class
 	 * , java.lang.Object)
 	 */
