@@ -1,7 +1,6 @@
 package br.gov.frameworkdemoiselle.transaction;
 
 import br.gov.frameworkdemoiselle.internal.exception.SystemException;
-import br.gov.frameworkdemoiselle.persistence.InTransaction;
 
 /**
  * This interface defines additional methods to it, allowing an application to
