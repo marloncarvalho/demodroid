@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import br.gov.frameworkdemoiselle.event.DatabaseCreation;
+import br.gov.frameworkdemoiselle.event.DatabaseUpgrade;
 import br.gov.frameworkdemoiselle.util.Dex;
 
 import com.google.inject.Inject;
@@ -23,9 +24,6 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
 	@Inject
 	private SQLBuilder sqlBuilder;
-
-	@Inject
-	private PersistenceInspector inspector;
 
 	@Inject
 	private EventManager eventManager;
@@ -45,11 +43,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		ArrayList<Class<?>> tables = Dex.getEntities(this.context);
-		for (Class<?> table : tables) {
-			db.execSQL("DROP TABLE IF EXISTS " + inspector.getTableName(table));
-		}
-		onCreate(db);
+		eventManager.fire(new DatabaseUpgrade(db, oldVersion, newVersion));
 	}
 
 	private static String getDatabaseName(Context context) {

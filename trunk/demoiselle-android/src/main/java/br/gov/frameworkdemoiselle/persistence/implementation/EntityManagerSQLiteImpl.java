@@ -137,8 +137,8 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 * br.gov.frameworkdemoiselle.persistence.EntityManager#createQuery(java
 	 * .lang.String)
 	 */
-	public Query createQuery(String query) {
-		return null;
+	public Query createQuery(Class<?> clazz, String query) {
+		return new QuerySQLiteImpl(query, getMappedEntity(clazz), databaseHelper.getReadableDatabase());
 	}
 
 	private MappedEntity getMappedEntity(Object object) {
