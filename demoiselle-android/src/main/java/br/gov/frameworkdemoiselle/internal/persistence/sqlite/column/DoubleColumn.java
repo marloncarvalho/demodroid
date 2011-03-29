@@ -1,10 +1,10 @@
-package br.gov.frameworkdemoiselle.internal.persistence.column;
+package br.gov.frameworkdemoiselle.internal.persistence.sqlite.column;
 
 import android.database.Cursor;
 import br.gov.frameworkdemoiselle.internal.persistence.MappedColumn;
 import br.gov.frameworkdemoiselle.util.Reflections;
 
-public class FloatColumn extends MappedColumn {
+public class DoubleColumn extends MappedColumn {
 
 	@Override
 	public String getValue(Object object) {
@@ -16,9 +16,10 @@ public class FloatColumn extends MappedColumn {
 	}
 
 	@Override
-	public void setValue(Object object, Cursor cursor) {
+	public void setValue(Object object, Object source) {
+		Cursor cursor = (Cursor) source;
 		int index = cursor.getColumnIndex(getName());
-		double value = cursor.getFloat(index);
+		double value = cursor.getDouble(index);
 		Reflections.setFieldValue(field, object, value);
 	}
 
