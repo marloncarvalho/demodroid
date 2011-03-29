@@ -19,10 +19,6 @@ public class DelegateCrud<T, C extends Crud<T>> implements Crud<T> {
 	@Inject
 	private Provider<C> provider;
 
-	public void delete(final long id) {
-		this.getDelegate().delete(id);
-	}
-
 	public List<T> findAll() {
 		return getDelegate().findAll();
 	}
@@ -51,6 +47,11 @@ public class DelegateCrud<T, C extends Crud<T>> implements Crud<T> {
 
 	public void update(final T bean) {
 		getDelegate().update(bean);
+	}
+
+	@Override
+	public void delete(final T object) {
+		 this.getDelegate().delete(object);		
 	}
 
 }

@@ -48,6 +48,7 @@ public class QuerySQLiteImpl implements Query {
 					mappedColumn.setValue(object, cursor);
 				}
 				resultList.add(object);
+				cursor.moveToNext();
 			}
 		}
 		cursor.close();
@@ -64,6 +65,16 @@ public class QuerySQLiteImpl implements Query {
 		}
 		Cursor cursor = database.rawQuery(query, selectionArgs);
 		return cursor;
+	}
+
+	@Override
+	public int executeUpdate() {
+		String[] selectionArgs = new String[args.size()];
+		for (Integer position : args.keySet()) {
+			selectionArgs[position] = args.get(position).toString();
+		}
+		database.execSQL(query, selectionArgs);
+		return 0;
 	}
 
 }

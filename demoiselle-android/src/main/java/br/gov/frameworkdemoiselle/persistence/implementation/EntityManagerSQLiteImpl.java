@@ -19,10 +19,11 @@ import br.gov.frameworkdemoiselle.internal.persistence.sqlite.column.DateColumn;
 import br.gov.frameworkdemoiselle.internal.persistence.sqlite.column.DoubleColumn;
 import br.gov.frameworkdemoiselle.internal.persistence.sqlite.column.FloatColumn;
 import br.gov.frameworkdemoiselle.internal.persistence.sqlite.column.IntegerColumn;
+import br.gov.frameworkdemoiselle.internal.persistence.sqlite.column.LongColumn;
 import br.gov.frameworkdemoiselle.internal.persistence.sqlite.column.ShortColumn;
+import br.gov.frameworkdemoiselle.internal.persistence.sqlite.column.StringColumn;
 import br.gov.frameworkdemoiselle.persistence.EntityManager;
 import br.gov.frameworkdemoiselle.persistence.Query;
-import br.gov.frameworkdemoiselle.util.Reflections;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -61,7 +62,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 * Object)
 	 */
 	public void merge(Object object) throws SystemException {
-		MappedEntity mappedEntity = getMappedEntity(object);
+		MappedEntity mappedEntity = getMappedEntity(object.getClass());
 		MappedColumn idMappedColumn = mappedEntity.getIdMappedColumn();
 		Object idValue = idMappedColumn.getValue(object);
 		String id = "";
@@ -125,9 +126,10 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 * .Object)
 	 */
 	public void persist(Object object) throws SystemException {
-		MappedEntity mappedEntity = getMappedEntity(object);
-		databaseHelper.getWritableDatabase().insertOrThrow(mappedEntity.getTableName(), null,
+		MappedEntity mappedEntity = getMappedEntity(object.getClass());
+		long id = databaseHelper.getWritableDatabase().insertOrThrow(mappedEntity.getTableName(), null,
 				createContentValues(mappedEntity, object));
+		mappedEntity.getIdMappedColumn().setValue(object, id);
 	}
 
 	/*
@@ -138,7 +140,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 * .Object)
 	 */
 	public void remove(Object object) throws SystemException {
-		MappedEntity mappedEntity = getMappedEntity(object);
+		MappedEntity mappedEntity = getMappedEntity(object.getClass());
 		MappedColumn idMappedColumn = mappedEntity.getIdMappedColumn();
 		Object idValue = idMappedColumn.getValue(object);
 		String id = "";
@@ -162,48 +164,51 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 		return new QuerySQLiteImpl(query, getMappedEntity(clazz), databaseHelper.getReadableDatabase());
 	}
 
-	private MappedEntity getMappedEntity(Object object) {
+	private MappedEntity getMappedEntity(Class<?> clasz) {
 		MappedEntity mappedEntity = null;
 
-		if (cached.containsKey(object.getClass())) {
-			mappedEntity = cached.get(object.getClass());
+		if (cached.containsKey(clasz)) {
+			mappedEntity = cached.get(clasz);
 		} else {
-			mappedEntity = createMappedEntity(object);
-			cached.put(object.getClass(), mappedEntity);
+			mappedEntity = createMappedEntity(clasz);
+			cached.put(clasz, mappedEntity);
 		}
 
 		return mappedEntity;
 	}
 
-	private MappedEntity createMappedEntity(Object object) {
+	private MappedEntity createMappedEntity(Class<?> clasz) {
 		MappedEntity result = new MappedEntity();
 
-		result.setMappedClass(object.getClass());
+		result.setMappedClass(clasz);
 
-		List<Field> fields = persistenceInspector.getAllPersistentFields(object.getClass());
+		List<Field> fields = persistenceInspector.getAllPersistentFields(clasz);
 		for (Field field : fields) {
-			result.addMappedColumn(getMappedColumnByType(field, object));
+			result.addMappedColumn(getMappedColumnByType(field));
 		}
 
 		return result;
 	}
 
-	private MappedColumn getMappedColumnByType(Field field, Object object) {
+	private MappedColumn getMappedColumnByType(Field field) {
 		MappedColumn mappedColumn = null;
-		Object value = Reflections.getFieldValue(field, object);
 
-		if (value instanceof Boolean || value.getClass().equals(boolean.class)) {
+		if (field.getType().equals(Boolean.class) || field.getType().equals(boolean.class)) {
 			mappedColumn = new BooleanColumn();
-		} else if (value instanceof Date) {
+		} else if (field.getType().equals(Date.class)) {
 			mappedColumn = new DateColumn();
-		} else if (value instanceof Integer || value.getClass().equals(int.class)) {
+		} else if (field.getType().equals(Integer.class) || field.getType().equals(int.class)) {
 			mappedColumn = new IntegerColumn();
-		} else if (value instanceof Float || value.getClass().equals(float.class)) {
+		} else if (field.getType().equals(Long.class) || field.getType().equals(long.class)) {
+			mappedColumn = new LongColumn();
+		} else if (field.getType().equals(Float.class) || field.getType().equals(float.class)) {
 			mappedColumn = new FloatColumn();
-		} else if (value instanceof Short || value.getClass().equals(short.class)) {
+		} else if (field.getType().equals(Short.class) || field.getType().equals(short.class)) {
 			mappedColumn = new ShortColumn();
-		} else if (value instanceof Double || value.getClass().equals(double.class)) {
+		} else if (field.getType().equals(Double.class) || field.getType().equals(double.class)) {
 			mappedColumn = new DoubleColumn();
+		} else if (field.getType().equals(String.class)) {
+			mappedColumn = new StringColumn();
 		}
 
 		mappedColumn.setField(field);
