@@ -17,10 +17,16 @@ public class LongColumn extends MappedColumn {
 
 	@Override
 	public void setValue(Object object, Object source) {
-		Cursor cursor = (Cursor) source;
-		int index = cursor.getColumnIndex(getName());
-		long value = cursor.getLong(index);
-		Reflections.setFieldValue(field, object, value);
+		if (source instanceof Cursor) {
+			Cursor cursor = (Cursor) source;
+			int index = cursor.getColumnIndex(getName());
+			long value = cursor.getLong(index);
+			Reflections.setFieldValue(field, object, value);
+		} else {
+			if ( source instanceof Long) {
+				Reflections.setFieldValue(field, object, source);	
+			}
+		}
 	}
 
 }

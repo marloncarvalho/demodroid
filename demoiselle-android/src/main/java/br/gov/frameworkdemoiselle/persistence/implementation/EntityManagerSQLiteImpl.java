@@ -71,8 +71,9 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 		} else {
 			id = "0";
 		}
-		databaseHelper.getWritableDatabase().update(mappedEntity.getTableName(),
-				createContentValues(mappedEntity, object), idMappedColumn.getName() + "=? ", new String[] { id });
+		databaseHelper.getWritableDatabase()
+				.update(mappedEntity.getTableName(), createContentValues(mappedEntity, object, false),
+						idMappedColumn.getName() + "=? ", new String[] { id });
 	}
 
 	/*
@@ -128,7 +129,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	public void persist(Object object) throws SystemException {
 		MappedEntity mappedEntity = getMappedEntity(object.getClass());
 		long id = databaseHelper.getWritableDatabase().insertOrThrow(mappedEntity.getTableName(), null,
-				createContentValues(mappedEntity, object));
+				createContentValues(mappedEntity, object, false));
 		mappedEntity.getIdMappedColumn().setValue(object, id);
 	}
 
@@ -215,12 +216,18 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 		return mappedColumn;
 	}
 
-	private ContentValues createContentValues(MappedEntity mappedEntity, Object object) {
+	private ContentValues createContentValues(MappedEntity mappedEntity, Object object, boolean includeId) {
 		ContentValues result = new ContentValues();
 
 		Collection<MappedColumn> columns = mappedEntity.getMappedColumns().values();
 		for (MappedColumn column : columns) {
-			result.put(column.getName(), column.getValue(object));
+			if (column.equals(mappedEntity.getIdMappedColumn())) {
+				if (includeId) {
+					result.put(column.getName(), column.getValue(object));
+				}
+			} else {
+				result.put(column.getName(), column.getValue(object));
+			}
 		}
 
 		return result;

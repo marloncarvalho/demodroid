@@ -2,7 +2,6 @@ package br.gov.frameworkdemoiselle.internal.persistence;
 
 import java.lang.reflect.Field;
 
-import android.database.Cursor;
 import br.gov.frameworkdemoiselle.persistence.annotation.Column;
 
 abstract public class MappedColumn {

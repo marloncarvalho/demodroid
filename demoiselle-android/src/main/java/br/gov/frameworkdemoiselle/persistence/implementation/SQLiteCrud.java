@@ -28,28 +28,28 @@ public class SQLiteCrud<E> implements Crud<E> {
 	}
 
 	public void insert(E object) {
-		Log.d("Persistence", "Inserting object");
+		Log.d("SQLiteCrud", "Inserting object");
 		entityManager.persist(object);
 	}
 
 	public void delete(Object object) {
-		Log.d("Persistence", "Deleting object");
+		Log.d("SQLiteCrud", "Deleting object");
 		entityManager.remove(object);
 	}
 
 	public void update(E object) {
-		Log.d("Persistence", "Updating object");
+		Log.d("SQLiteCrud", "Updating object");
 		entityManager.merge(object);
 	}
 
 	public E find(long id) {
-		Log.d("Persistence", "Find Entity");
+		Log.d("SQLiteCrud", "Find Entity");
 		return entityManager.find(clasz, id);
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<E> findAll() {
-		Log.d("Persistence", "Finding all entities");
+		Log.d("SQLiteCrud", "Finding all entities");
 		Query query = entityManager.createQuery(clasz, "select * from " + inspector.getTableName(clasz));
 		return (List<E>) query.getResultList();
 	}
