@@ -1,7 +1,7 @@
 package br.gov.frameworkdemoiselle.transaction;
 
 import br.gov.frameworkdemoiselle.internal.exception.SystemException;
-import br.gov.frameworkdemoiselle.internal.persistence.SQLiteDatabaseHelper;
+import br.gov.frameworkdemoiselle.internal.persistence.sqlite.SQLiteDatabaseHelper;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
