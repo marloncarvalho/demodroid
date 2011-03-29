@@ -14,4 +14,5 @@ public interface Query {
 
 	Object getRawResult();
 
+	int executeUpdate();
 }

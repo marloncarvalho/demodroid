@@ -41,7 +41,7 @@ import java.util.List;
 
 public interface Crud<T> extends Serializable {
 
-	void delete(long id);
+	void delete(T object);
 
 	List<T> findAll();
 

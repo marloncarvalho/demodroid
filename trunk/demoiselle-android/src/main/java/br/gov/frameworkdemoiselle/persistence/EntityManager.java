@@ -13,11 +13,11 @@ public interface EntityManager {
 	boolean isOpen() throws SystemException;
 
 	void persist(Object object) throws SystemException;
-	
+
 	void merge(Object object) throws SystemException;
 
 	void remove(Object object) throws SystemException;
 
-	Query createQuery(Class<?> clazz, String query); 
+	Query createQuery(Class<?> clazz, String query) throws SystemException;
 
 }

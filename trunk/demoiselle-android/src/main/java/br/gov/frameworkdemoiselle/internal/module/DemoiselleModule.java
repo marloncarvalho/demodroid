@@ -2,9 +2,12 @@ package br.gov.frameworkdemoiselle.internal.module;
 
 import roboguice.config.AbstractAndroidModule;
 import android.content.Context;
+import br.gov.frameworkdemoiselle.annotation.SQLite;
 import br.gov.frameworkdemoiselle.internal.bootstrap.ConfigurationBootstrap;
 import br.gov.frameworkdemoiselle.internal.bootstrap.StartupBootstrap;
 import br.gov.frameworkdemoiselle.internal.processor.ConfigurationProcessor;
+import br.gov.frameworkdemoiselle.persistence.EntityManager;
+import br.gov.frameworkdemoiselle.persistence.implementation.EntityManagerSQLiteImpl;
 
 import com.google.inject.Provider;
 import com.google.inject.Provides;
@@ -17,7 +20,7 @@ public class DemoiselleModule extends AbstractAndroidModule {
 	protected void configure() {
 		bindListener(Matchers.any(), new ConfigurationBootstrap());
 		bindListener(Matchers.any(), new StartupBootstrap());
-//		bindListener(Matchers.subclassesOf(Transaction.class), new SQLiteTransaction());
+		bind(EntityManager.class).annotatedWith(SQLite.class).to(EntityManagerSQLiteImpl.class);
 	}
 
 	@Provides
