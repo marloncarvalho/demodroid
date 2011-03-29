@@ -14,7 +14,7 @@ import br.gov.frameworkdemoiselle.persistence.Query;
 public class QuerySQLiteImpl implements Query {
 	private SQLiteDatabase database;
 	private int maxResults;
-	private int firstResult;
+	private int firstResult = 0;
 	private String query;
 	private Map<Integer, Object> args = new HashMap<Integer, Object>();
 	private MappedEntity mappedEntity;
@@ -58,6 +58,9 @@ public class QuerySQLiteImpl implements Query {
 		String[] selectionArgs = new String[args.size()];
 		for (Integer position : args.keySet()) {
 			selectionArgs[position] = args.get(position).toString();
+		}
+		if (maxResults > 0) {
+			query = query + " LIMIT " + firstResult + "," + maxResults;
 		}
 		Cursor cursor = database.rawQuery(query, selectionArgs);
 		return cursor;
