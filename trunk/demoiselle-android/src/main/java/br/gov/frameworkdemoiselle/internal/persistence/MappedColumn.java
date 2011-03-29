@@ -39,7 +39,7 @@ abstract public class MappedColumn {
 
 	public abstract String getValue(Object object);
 
-	public abstract void setValue(Object object, Cursor cursor);
+	public abstract void setValue(Object object, Object source);
 
 	public Field getField() {
 		return field;

@@ -1,4 +1,4 @@
-package br.gov.frameworkdemoiselle.internal.persistence.column;
+package br.gov.frameworkdemoiselle.internal.persistence.sqlite.column;
 
 import java.util.Date;
 
@@ -24,7 +24,8 @@ public class DateColumn extends MappedColumn {
 	}
 
 	@Override
-	public void setValue(Object object, Cursor cursor) {
+	public void setValue(Object object, Object source) {
+		Cursor cursor = (Cursor) source;
 		int index = cursor.getColumnIndex(getName());
 		String value = cursor.getString(index);
 		Date result = DateUtils.format(value, DATE_FORMAT);

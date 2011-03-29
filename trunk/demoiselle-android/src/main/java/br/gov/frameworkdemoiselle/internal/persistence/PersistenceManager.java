@@ -2,6 +2,7 @@ package br.gov.frameworkdemoiselle.internal.persistence;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import br.gov.frameworkdemoiselle.internal.persistence.sqlite.SQLiteDatabaseHelper;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;

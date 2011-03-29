@@ -1,4 +1,4 @@
-package br.gov.frameworkdemoiselle.internal.persistence;
+package br.gov.frameworkdemoiselle.internal.persistence.sqlite;
 
 import java.util.ArrayList;
 
@@ -11,6 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import br.gov.frameworkdemoiselle.event.DatabaseCreation;
 import br.gov.frameworkdemoiselle.event.DatabaseUpgrade;
+import br.gov.frameworkdemoiselle.internal.persistence.SQLBuilder;
 import br.gov.frameworkdemoiselle.util.Dex;
 
 import com.google.inject.Inject;
