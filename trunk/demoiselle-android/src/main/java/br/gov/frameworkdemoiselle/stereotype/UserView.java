@@ -43,25 +43,11 @@ import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.inject.Named;
-
-/**
- * Identifies a <b>view controller</b> class. A view controller class is intend to respond to events initiated in the
- * application front-view. It should have attributes and methods intented to populate the view.
- * <p>
- * A <i>View Controller</i> is:
- * <ul>
- * <li>defined when annotated with {@code @ViewController}</li>
- * <li>automatically injected whenever {@code @Inject} is used</li>
- * </ul>
- * 
- * @author SERPRO
- * @see @Controller
- */
-@Named
-@Controller
 @Inherited
 @Target(TYPE)
 @Retention(RUNTIME)
-public @interface ViewController {
+public @interface UserView {
+	
+	int value();
+	
 }
