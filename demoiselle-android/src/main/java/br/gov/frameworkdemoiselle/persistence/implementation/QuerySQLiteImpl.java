@@ -18,11 +18,13 @@ public class QuerySQLiteImpl implements Query {
 	private String query;
 	private Map<Integer, Object> args = new HashMap<Integer, Object>();
 	private MappedEntity mappedEntity;
+	private boolean closeable = false;
 
-	public QuerySQLiteImpl(String query, MappedEntity mappedEntity, SQLiteDatabase database) {
+	public QuerySQLiteImpl(String query, MappedEntity mappedEntity, SQLiteDatabase database, boolean closeable) {
 		this.database = database;
 		this.query = query;
 		this.mappedEntity = mappedEntity;
+		this.closeable = closeable;
 	}
 
 	public void setMaxResults(int maxResults) {
@@ -52,6 +54,9 @@ public class QuerySQLiteImpl implements Query {
 			}
 		}
 		cursor.close();
+		if (closeable) {
+			database.close();
+		}
 		return resultList;
 	}
 
@@ -67,13 +72,15 @@ public class QuerySQLiteImpl implements Query {
 		return cursor;
 	}
 
-	@Override
 	public int executeUpdate() {
 		String[] selectionArgs = new String[args.size()];
 		for (Integer position : args.keySet()) {
 			selectionArgs[position] = args.get(position).toString();
 		}
 		database.execSQL(query, selectionArgs);
+		if (closeable) {
+			database.close();
+		}
 		return 0;
 	}
 

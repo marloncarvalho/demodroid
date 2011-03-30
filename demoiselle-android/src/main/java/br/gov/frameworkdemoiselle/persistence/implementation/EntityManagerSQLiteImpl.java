@@ -24,6 +24,7 @@ import br.gov.frameworkdemoiselle.internal.persistence.sqlite.column.ShortColumn
 import br.gov.frameworkdemoiselle.internal.persistence.sqlite.column.StringColumn;
 import br.gov.frameworkdemoiselle.persistence.EntityManager;
 import br.gov.frameworkdemoiselle.persistence.Query;
+import br.gov.frameworkdemoiselle.transaction.Transaction;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -42,6 +43,9 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 
 	@Inject
 	private PersistenceInspector persistenceInspector;
+
+	@Inject
+	private Transaction transaction;
 
 	private Map<Class<?>, MappedEntity> cached = new WeakHashMap<Class<?>, MappedEntity>();
 
@@ -74,6 +78,9 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 		databaseHelper.getWritableDatabase()
 				.update(mappedEntity.getTableName(), createContentValues(mappedEntity, object, false),
 						idMappedColumn.getName() + "=? ", new String[] { id });
+		if (!transaction.isActive()) {
+			close();
+		}
 	}
 
 	/*
@@ -98,6 +105,10 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 		}
 
 		cursor.close();
+		if (!transaction.isActive()) {
+			close();
+		}
+
 		return (T) object;
 	}
 
@@ -131,6 +142,9 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 		long id = databaseHelper.getWritableDatabase().insertOrThrow(mappedEntity.getTableName(), null,
 				createContentValues(mappedEntity, object, false));
 		mappedEntity.getIdMappedColumn().setValue(object, id);
+		if (!transaction.isActive()) {
+			close();
+		}
 	}
 
 	/*
@@ -152,6 +166,9 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 		}
 		databaseHelper.getWritableDatabase().delete(mappedEntity.getTableName(), idMappedColumn.getName() + "=? ",
 				new String[] { id });
+		if (!transaction.isActive()) {
+			close();
+		}
 	}
 
 	/*
@@ -162,7 +179,8 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 * .lang.String)
 	 */
 	public Query createQuery(Class<?> clazz, String query) {
-		return new QuerySQLiteImpl(query, getMappedEntity(clazz), databaseHelper.getReadableDatabase());
+		return new QuerySQLiteImpl(query, getMappedEntity(clazz), databaseHelper.getReadableDatabase(),
+				!transaction.isActive());
 	}
 
 	private MappedEntity getMappedEntity(Class<?> clasz) {

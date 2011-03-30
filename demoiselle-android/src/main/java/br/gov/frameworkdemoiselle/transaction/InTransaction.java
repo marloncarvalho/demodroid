@@ -1,7 +1,7 @@
 package br.gov.frameworkdemoiselle.transaction;
 
-public interface InTransaction {
+public interface InTransaction<Result> {
 
-	void execute() throws Throwable;
+	Result execute() throws Throwable;
 
 }

@@ -76,16 +76,17 @@ public class SQLiteTransaction implements Transaction {
 	 * @see br.gov.frameworkdemoiselle.transaction.Transaction#call(br.gov.
 	 * frameworkdemoiselle.persistence.InTransaction)
 	 */
-	public Transaction call(InTransaction inTransaction) throws RuntimeException {
+	public <T> T call(InTransaction<T> inTransaction) throws RuntimeException {
+		T result = null;
 		begin();
 		try {
-			inTransaction.execute();
+			result = inTransaction.execute();
 			commit();
 		} catch (Throwable throwable) {
 			rollback();
 			throw new RuntimeException(throwable);
 		}
-		return this;
+		return result;
 	}
 
 }
