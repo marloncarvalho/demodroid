@@ -10,7 +10,7 @@ import br.gov.frameworkdemoiselle.internal.exception.SystemException;
  */
 public interface Transaction {
 
-	Transaction call(InTransaction inTransaction);
+	<T> T call(InTransaction<T> inTransaction);
 
 	/**
 	 * Indicates whether the given transaction is still active.

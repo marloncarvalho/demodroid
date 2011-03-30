@@ -29,10 +29,22 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 	@Inject
 	private EventManager eventManager;
 
+	private SQLiteDatabase cachedDatabase;
+
 	@Inject
 	public SQLiteDatabaseHelper(Context context) {
 		super(context, getDatabaseName(context), null, getDatabaseVersion(context));
 		this.context = context;
+	}
+
+	@Override
+	public synchronized SQLiteDatabase getWritableDatabase() {
+		if (cachedDatabase == null) {
+			cachedDatabase = super.getWritableDatabase();
+		} else if (!cachedDatabase.isOpen()) {
+			cachedDatabase = super.getWritableDatabase();
+		}
+		return cachedDatabase;
 	}
 
 	public void onCreate(SQLiteDatabase db) {

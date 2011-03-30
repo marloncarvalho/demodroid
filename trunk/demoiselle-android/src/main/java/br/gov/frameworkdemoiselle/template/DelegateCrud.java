@@ -49,7 +49,6 @@ public class DelegateCrud<T, C extends Crud<T>> implements Crud<T> {
 		getDelegate().update(bean);
 	}
 
-	@Override
 	public void delete(final T object) {
 		 this.getDelegate().delete(object);		
 	}
