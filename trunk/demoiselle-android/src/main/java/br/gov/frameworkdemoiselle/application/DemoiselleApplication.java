@@ -4,6 +4,7 @@ import java.util.List;
 
 import roboguice.application.RoboApplication;
 import br.gov.frameworkdemoiselle.internal.module.DemoiselleModule;
+import br.gov.frameworkdemoiselle.util.Beans;
 
 import com.google.inject.Module;
 
@@ -21,6 +22,7 @@ public class DemoiselleApplication extends RoboApplication {
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Beans.setInjector(getInjector());
 	}
 
 	@Override
