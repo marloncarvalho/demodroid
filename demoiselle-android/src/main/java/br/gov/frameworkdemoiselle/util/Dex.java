@@ -10,6 +10,12 @@ import android.util.Log;
 import br.gov.frameworkdemoiselle.persistence.annotation.Entity;
 import dalvik.system.DexFile;
 
+/**
+ * Utility class responsible to get special informations about Dex file.
+ * 
+ * @author Marlon Silva Carvalho
+ * @since 1.0.0
+ */
 public class Dex {
 
 	public static ArrayList<Class<?>> getEntities(Context context) {
