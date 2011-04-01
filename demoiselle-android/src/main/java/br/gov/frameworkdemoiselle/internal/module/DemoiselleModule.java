@@ -5,9 +5,12 @@ import android.content.Context;
 import br.gov.frameworkdemoiselle.annotation.SQLite;
 import br.gov.frameworkdemoiselle.internal.bootstrap.ConfigurationBootstrap;
 import br.gov.frameworkdemoiselle.internal.bootstrap.StartupBootstrap;
+import br.gov.frameworkdemoiselle.internal.implementation.ToasterMessageContextImpl;
 import br.gov.frameworkdemoiselle.internal.processor.ConfigurationProcessor;
+import br.gov.frameworkdemoiselle.message.MessageContext;
 import br.gov.frameworkdemoiselle.persistence.EntityManager;
 import br.gov.frameworkdemoiselle.persistence.implementation.EntityManagerSQLiteImpl;
+import br.gov.frameworkdemoiselle.stereotype.Toaster;
 import br.gov.frameworkdemoiselle.transaction.SQLiteTransaction;
 import br.gov.frameworkdemoiselle.transaction.Transaction;
 
@@ -23,6 +26,7 @@ public class DemoiselleModule extends AbstractAndroidModule {
 		bindListener(Matchers.any(), new ConfigurationBootstrap());
 		bindListener(Matchers.any(), new StartupBootstrap());
 		bind(EntityManager.class).annotatedWith(SQLite.class).to(EntityManagerSQLiteImpl.class);
+		bind(MessageContext.class).annotatedWith(Toaster.class).to(ToasterMessageContextImpl.class);
 		bind(Transaction.class).to(SQLiteTransaction.class);
 	}
 
