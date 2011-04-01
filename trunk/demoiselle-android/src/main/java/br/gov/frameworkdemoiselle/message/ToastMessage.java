@@ -2,7 +2,13 @@ package br.gov.frameworkdemoiselle.message;
 
 import br.gov.frameworkdemoiselle.util.Strings;
 
-public class ToasterMessage implements Message {
+/**
+ * Message interface implementation to Toast Messages.
+ * 
+ * @author Marlon Silva Carvalho
+ * @since 1.0.0
+ */
+public class ToastMessage implements Message {
 
 	private final String originalText;
 
@@ -14,7 +20,7 @@ public class ToasterMessage implements Message {
 
 	public static final SeverityType DEFAULT_SEVERITY = SeverityType.INFO;
 
-	public ToasterMessage(String text, SeverityType severity, Object... params) {
+	public ToastMessage(String text, SeverityType severity, Object... params) {
 		this.originalText = text;
 		this.severity = (severity == null ? DEFAULT_SEVERITY : severity);
 		this.params = params;

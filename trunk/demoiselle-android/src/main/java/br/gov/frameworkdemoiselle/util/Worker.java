@@ -6,11 +6,12 @@ import android.os.AsyncTask;
 import android.util.Log;
 import br.gov.frameworkdemoiselle.message.MessageContext;
 import br.gov.frameworkdemoiselle.message.SeverityType;
+import br.gov.frameworkdemoiselle.stereotype.Toaster;
 
 import com.google.inject.Inject;
 
 /**
- * Utilitário que lança tarefas assíncronas.
+ * Utility class that launches asynchronous tasks.
  * 
  * @author Marlon Silva Carvalho
  * @since 1.0.0
@@ -18,6 +19,7 @@ import com.google.inject.Inject;
 public class Worker {
 
 	@Inject
+	@Toaster
 	private MessageContext messageContext;
 	private Object caller;
 	private String methodName;
@@ -91,7 +93,7 @@ public class Worker {
 		new AsyncTask<Void, Void, Void>() {
 
 			private ProgressDialog dialog;
-			
+
 			@Override
 			protected void onPreExecute() {
 				dialog = ProgressDialog.show(context, dialogTitle, dialogBody);
@@ -106,16 +108,16 @@ public class Worker {
 			protected Void doInBackground(Void... params) {
 				try {
 
-					Log.d("Worker", "Calling [" + methodName + "] in object [" + caller
-							+ "] with params [" + callParams + "].");
+					Log.d("Worker", "Calling [" + methodName + "] in object [" + caller + "] with params ["
+							+ callParams + "].");
 
 					Reflections.callMethod(caller, methodName, callParams);
 
 					Log.d("Worker", "Call Success.");
-					
+
 					// Show Success Message.
 					if (onSuccessMessage != null && !"".equals(onSuccessMessage)) {
-						Log.d("Worker","Showing Success Message [" + onSuccessMessage + "];");
+						Log.d("Worker", "Showing Success Message [" + onSuccessMessage + "];");
 						messageContext.add(onSuccessMessage);
 					}
 
@@ -124,14 +126,14 @@ public class Worker {
 						Log.d("Worker", "Calling Success Method [" + methodName + "] in object [" + caller
 								+ "] with params [" + callParams + "].");
 						Reflections.callMethod(onSuccessCaller, onSuccessMethod, onSuccessParams);
-						Log.d("Worker","Success Method Called with Success :)");
+						Log.d("Worker", "Success Method Called with Success :)");
 					}
 
 				} catch (Throwable throwable) {
 
 					// Show Exception Message.
 					if (onExceptionMessage != null && !"".equals(onExceptionMessage)) {
-						Log.d("Worker","Showing Exception Message [" + onExceptionMessage + "];");
+						Log.d("Worker", "Showing Exception Message [" + onExceptionMessage + "];");
 						messageContext.add(onExceptionMessage, SeverityType.ERROR);
 					}
 
@@ -140,7 +142,7 @@ public class Worker {
 						Log.d("Worker", "Calling Success Method [" + methodName + "] in object [" + caller
 								+ "] with params [" + callParams + "].");
 						Reflections.callMethod(onExceptionCaller, onExceptionMethod, onExceptionParams);
-						Log.d("Worker","Exception Method Called with Success :)");
+						Log.d("Worker", "Exception Method Called with Success :)");
 					}
 
 				}
