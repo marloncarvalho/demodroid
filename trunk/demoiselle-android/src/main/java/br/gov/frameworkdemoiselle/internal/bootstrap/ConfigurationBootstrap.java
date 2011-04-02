@@ -13,12 +13,10 @@ import com.google.inject.spi.TypeListener;
 public class ConfigurationBootstrap implements TypeListener {
 	private Provider<ConfigurationProcessor> configurationProcessor;
 
-	public <I> void hear(TypeLiteral<I> typeLiteral,
-			TypeEncounter<I> typeEncounter) {
+	public <I> void hear(TypeLiteral<I> typeLiteral, TypeEncounter<I> typeEncounter) {
 		if (typeLiteral.getRawType().isAnnotationPresent(Configuration.class)) {
 			if (configurationProcessor == null) {
-				configurationProcessor = typeEncounter
-						.getProvider(ConfigurationProcessor.class);
+				configurationProcessor = typeEncounter.getProvider(ConfigurationProcessor.class);
 			}
 			typeEncounter.register(new ConfigurationListener());
 		}

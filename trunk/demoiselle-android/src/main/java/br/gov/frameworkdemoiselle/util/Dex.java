@@ -36,8 +36,7 @@ public class Dex {
 					Log.e("Demoiselle", e.getMessage());
 				}
 
-				if ((discoveredClass == null) || (superClass == null)
-						|| (!discoveredClass.isAnnotationPresent(Entity.class)))
+				if ((discoveredClass == null) || (superClass == null) || (!discoveredClass.isAnnotationPresent(Entity.class)))
 					continue;
 				entityClasses.add(discoveredClass);
 			}

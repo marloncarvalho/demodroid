@@ -168,19 +168,14 @@ public class Reflections {
 	}
 
 	public static Object callMethod(Object object, String methodName, Object... params) {
-		Class<?>[] parameterTypes = new Class[params.length];
-
-		int index = 0;
-		for (Object param : params) {
-			parameterTypes[index++] = param.getClass();
-		}
-
 		try {
-			Method method = object.getClass().getMethod(methodName, parameterTypes);
-			return method.invoke(object, params);
+			for (Method method : object.getClass().getMethods()) {
+				if (method.getName().equals(methodName)) {
+					return method.invoke(object, params);
+				}
+			}
+			return null;
 		} catch (SecurityException e) {
-			throw new RuntimeException(e);
-		} catch (NoSuchMethodException e) {
 			throw new RuntimeException(e);
 		} catch (IllegalArgumentException e) {
 			throw new RuntimeException(e);
@@ -189,6 +184,32 @@ public class Reflections {
 		} catch (InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static Method getMethod(Class<?> clasz, String methodName) {
+		for (Method method : clasz.getMethods()) {
+			if (method.getName().equals(methodName)) {
+				return method;
+			}
+		}
+		return null;
+	}
+
+	public static Throwable findExceptionForMethodParameter(Method method, Throwable throwable) {
+		Throwable result = null;
+		Class<?> paramType = method.getParameterTypes()[0];
+		if (paramType.isInstance(throwable)) {
+			result = throwable;
+		} else {
+			Throwable auxResult = throwable;
+			while ((auxResult = auxResult.getCause()) != null) {
+				if (auxResult.getClass().equals(paramType)) {
+					result = auxResult;
+					break;
+				}
+			}
+		}
+		return result;
 	}
 
 }

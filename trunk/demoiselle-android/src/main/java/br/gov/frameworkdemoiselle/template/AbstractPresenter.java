@@ -1,14 +1,14 @@
 package br.gov.frameworkdemoiselle.template;
 
+@SuppressWarnings("all")
+abstract public class AbstractPresenter<V extends AbstractView> {
+	private V view;
 
-abstract public class AbstractPresenter {
-	private AbstractView view;
-
-	public AbstractView getView() {
+	public V getView() {
 		return view;
 	}
 
-	public void setView(AbstractView view) {
+	void setView(V view) {
 		this.view = view;
 	}
 

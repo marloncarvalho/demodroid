@@ -23,8 +23,8 @@ public class LongColumn extends MappedColumn {
 			long value = cursor.getLong(index);
 			Reflections.setFieldValue(field, object, value);
 		} else {
-			if ( source instanceof Long) {
-				Reflections.setFieldValue(field, object, source);	
+			if (source instanceof Long) {
+				Reflections.setFieldValue(field, object, source);
 			}
 		}
 	}

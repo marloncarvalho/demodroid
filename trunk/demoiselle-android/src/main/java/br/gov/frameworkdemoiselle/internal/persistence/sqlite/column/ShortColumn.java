@@ -22,5 +22,5 @@ public class ShortColumn extends MappedColumn {
 		double value = cursor.getShort(index);
 		Reflections.setFieldValue(field, object, value);
 	}
-	
+
 }

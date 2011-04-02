@@ -91,8 +91,7 @@ public class Strings {
 					result.append(field.getName());
 					result.append("=");
 					fieldValue = Reflections.getFieldValue(field, object);
-					result.append(fieldValue != null && fieldValue.getClass().isArray() ? Arrays
-							.toString((Object[]) fieldValue) : fieldValue);
+					result.append(fieldValue != null && fieldValue.getClass().isArray() ? Arrays.toString((Object[]) fieldValue) : fieldValue);
 				}
 			}
 

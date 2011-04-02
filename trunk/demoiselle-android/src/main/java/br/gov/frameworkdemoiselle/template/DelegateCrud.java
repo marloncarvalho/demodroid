@@ -50,7 +50,7 @@ public class DelegateCrud<T, C extends Crud<T>> implements Crud<T> {
 	}
 
 	public void delete(final T object) {
-		 this.getDelegate().delete(object);		
+		this.getDelegate().delete(object);
 	}
 
 }

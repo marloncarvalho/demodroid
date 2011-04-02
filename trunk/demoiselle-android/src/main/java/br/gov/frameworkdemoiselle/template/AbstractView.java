@@ -6,13 +6,16 @@ import br.gov.frameworkdemoiselle.activity.DemoiselleActivity;
 import br.gov.frameworkdemoiselle.event.AfterCreation;
 import br.gov.frameworkdemoiselle.event.BeforeCreation;
 import br.gov.frameworkdemoiselle.stereotype.UserView;
+import br.gov.frameworkdemoiselle.util.Beans;
+import br.gov.frameworkdemoiselle.util.Reflections;
 
 import com.google.inject.Inject;
 
-abstract public class AbstractView extends DemoiselleActivity {
+@SuppressWarnings("all")
+abstract public class AbstractView<P extends AbstractPresenter> extends DemoiselleActivity {
 
 	private int contentView;
-	
+
 	@Inject
 	private EventManager eventManager;
 
@@ -22,7 +25,7 @@ abstract public class AbstractView extends DemoiselleActivity {
 		}
 	}
 
-	public void registerPresenter(AbstractPresenter presenter) {
+	final public void registerPresenter(P presenter) {
 		presenter.setView(this);
 	}
 
@@ -30,6 +33,7 @@ abstract public class AbstractView extends DemoiselleActivity {
 	final protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(contentView);
+
 		eventManager.fire(this, new BeforeCreation());
 		processCreation(savedInstanceState);
 		eventManager.fire(this, new AfterCreation());

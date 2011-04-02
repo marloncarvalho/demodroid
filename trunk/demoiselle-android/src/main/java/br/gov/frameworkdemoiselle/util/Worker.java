@@ -1,5 +1,7 @@
 package br.gov.frameworkdemoiselle.util;
 
+import java.lang.reflect.Method;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -28,7 +30,6 @@ public class Worker {
 	private String onExceptionMessage;
 	private Object onExceptionCaller;
 	private String onExceptionMethod;
-	private Object[] onExceptionParams;
 	private Object onSuccessCaller;
 	private String onSuccessMethod;
 	private Object[] onSuccessParams;
@@ -36,12 +37,9 @@ public class Worker {
 	/**
 	 * Default constructor.
 	 * 
-	 * @param caller
-	 *            Object from which the "method" will be called.
-	 * @param method
-	 *            Method to be called in "Object".
-	 * @param callerParams
-	 *            Parameters that will be used to call "Method" in "Object".
+	 * @param caller Object from which the "method" will be called.
+	 * @param method Method to be called in "Object".
+	 * @param callerParams Parameters that will be used to call "Method" in "Object".
 	 */
 	public Worker(Object caller, String method, Object... callerParams) {
 		this.caller = caller;
@@ -79,10 +77,9 @@ public class Worker {
 		return this;
 	}
 
-	public Worker onExceptionCall(Object caller, String method, Object... callerParams) {
+	public Worker onExceptionCall(Object caller, String method) {
 		this.onExceptionCaller = caller;
 		this.onExceptionMethod = method;
-		this.onExceptionParams = callerParams;
 		return this;
 	}
 
@@ -108,8 +105,7 @@ public class Worker {
 			protected Void doInBackground(Void... params) {
 				try {
 
-					Log.d("Worker", "Calling [" + methodName + "] in object [" + caller + "] with params ["
-							+ callParams + "].");
+					Log.d("Worker", "Calling [" + methodName + "] in object [" + caller + "] with params [" + callParams + "].");
 
 					Reflections.callMethod(caller, methodName, callParams);
 
@@ -123,13 +119,21 @@ public class Worker {
 
 					// Call Success Method.
 					if (onSuccessCaller != null && onSuccessMethod != null && !"".equals(onSuccessMessage)) {
-						Log.d("Worker", "Calling Success Method [" + methodName + "] in object [" + caller
-								+ "] with params [" + callParams + "].");
-						Reflections.callMethod(onSuccessCaller, onSuccessMethod, onSuccessParams);
+						Log.d("Worker", "Calling Success Method [" + methodName + "] in object [" + caller + "] with params [" + callParams + "].");
+
+						Activities.getActual().runOnUiThread(new Runnable() {
+
+							@Override
+							public void run() {
+								Reflections.callMethod(onSuccessCaller, onSuccessMethod, onSuccessParams);
+							}
+
+						});
+
 						Log.d("Worker", "Success Method Called with Success :)");
 					}
 
-				} catch (Throwable throwable) {
+				} catch (final Throwable throwable) {
 
 					// Show Exception Message.
 					if (onExceptionMessage != null && !"".equals(onExceptionMessage)) {
@@ -139,9 +143,8 @@ public class Worker {
 
 					// Call Exception Method.
 					if (onExceptionCaller != null && onExceptionMethod != null && !"".equals(onExceptionMessage)) {
-						Log.d("Worker", "Calling Success Method [" + methodName + "] in object [" + caller
-								+ "] with params [" + callParams + "].");
-						Reflections.callMethod(onExceptionCaller, onExceptionMethod, onExceptionParams);
+						Log.d("Worker", "Calling Exception Method [" + onExceptionMethod + "] in object [" + onExceptionCaller + "] with params [" + throwable + "].");
+						callForException(throwable);
 						Log.d("Worker", "Exception Method Called with Success :)");
 					}
 
@@ -151,4 +154,19 @@ public class Worker {
 
 		}.execute();
 	}
+
+	private void callForException(final Throwable throwable) {
+		Method method = Reflections.getMethod(onExceptionCaller.getClass(), onExceptionMethod);
+		if (method != null) {
+			final Throwable result = Reflections.findExceptionForMethodParameter(method, throwable);
+			if (result != null) {
+				Activities.getActual().runOnUiThread(new Runnable() {
+					@Override public void run() {
+						Reflections.callMethod(onExceptionCaller, onExceptionMethod, result);
+					}
+				});
+			}
+		}
+	}
+
 }
