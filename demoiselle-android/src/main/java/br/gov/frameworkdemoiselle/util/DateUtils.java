@@ -10,12 +10,10 @@ public class DateUtils {
 	public static int calcularDiferencaDias(Date data1, Date data2) {
 		Calendar calendarData1 = Calendar.getInstance();
 		calendarData1.setTime(data1);
-		Long dateStamp1 = (calendarData1.getTimeInMillis() - (calendarData1.getTimeInMillis() % (1000 * 60 * 60 * 24)))
-				/ (1000 * 60 * 60 * 24);
+		Long dateStamp1 = (calendarData1.getTimeInMillis() - (calendarData1.getTimeInMillis() % (1000 * 60 * 60 * 24))) / (1000 * 60 * 60 * 24);
 		Calendar calendarData2 = Calendar.getInstance();
 		calendarData2.setTime(data2);
-		Long dateStamp2 = (calendarData2.getTimeInMillis() - (calendarData2.getTimeInMillis() % (1000 * 60 * 60 * 24)))
-				/ (1000 * 60 * 60 * 24);
+		Long dateStamp2 = (calendarData2.getTimeInMillis() - (calendarData2.getTimeInMillis() % (1000 * 60 * 60 * 24))) / (1000 * 60 * 60 * 24);
 		Long diff = dateStamp1 - dateStamp2;
 		return Math.abs(diff.intValue());
 	}

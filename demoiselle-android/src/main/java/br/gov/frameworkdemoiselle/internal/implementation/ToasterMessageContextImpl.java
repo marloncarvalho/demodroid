@@ -3,13 +3,12 @@ package br.gov.frameworkdemoiselle.internal.implementation;
 import java.util.List;
 
 import android.app.Activity;
-import android.content.Context;
 import android.widget.Toast;
 import br.gov.frameworkdemoiselle.message.Message;
 import br.gov.frameworkdemoiselle.message.MessageContext;
 import br.gov.frameworkdemoiselle.message.SeverityType;
+import br.gov.frameworkdemoiselle.message.ToastMessage;
 import br.gov.frameworkdemoiselle.util.Activities;
-import br.gov.frameworkdemoiselle.util.Beans;
 
 /**
  * Default ${link MessageContext} implementation. Delegates to Toaster.
@@ -23,13 +22,12 @@ public class ToasterMessageContextImpl implements MessageContext {
 	 * (non-Javadoc)
 	 * @see br.gov.frameworkdemoiselle.message.MessageContext#add(br.gov.frameworkdemoiselle.message.Message, java.lang.Object[])
 	 */
-	public void add(final Message message, final Object... params) {
-		final Context context = Beans.getBean(Context.class);
-		Activity activity = Activities.getActual();
+	public void add(final Message message) {
+		final Activity activity = Activities.getActual();
 		activity.runOnUiThread(new Runnable() {
 
 			public void run() {
-				Toast toast = Toast.makeText(context, message.getText(), Toast.LENGTH_SHORT);
+				Toast toast = Toast.makeText(activity, message.getText(), Toast.LENGTH_SHORT);
 				toast.show();
 			}
 		});
@@ -41,15 +39,7 @@ public class ToasterMessageContextImpl implements MessageContext {
 	 * @see br.gov.frameworkdemoiselle.message.MessageContext#add(java.lang.String, java.lang.Object[])
 	 */
 	public void add(final String text, final Object... params) {
-		final Context context = Beans.getBean(Context.class);
-		Activity activity = Activities.getActual();
-		activity.runOnUiThread(new Runnable() {
-
-			public void run() {
-				Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
-				toast.show();
-			}
-		});
+		add(new ToastMessage(text, SeverityType.INFO, params));
 	}
 
 	/*
@@ -57,24 +47,17 @@ public class ToasterMessageContextImpl implements MessageContext {
 	 * @see br.gov.frameworkdemoiselle.message.MessageContext#add(java.lang.String, br.gov.frameworkdemoiselle.message.SeverityType, java.lang.Object[])
 	 */
 	public void add(final String text, final SeverityType severity, final Object... params) {
-		final Context context = Beans.getBean(Context.class);
-		Activity activity = Activities.getActual();
-		activity.runOnUiThread(new Runnable() {
-
-			public void run() {
-				Toast toast = Toast.makeText(context, text, Toast.LENGTH_SHORT);
-				toast.show();
-			}
-
-		});
+		add(new ToastMessage(text, severity, params));
 	}
 
 	public void add(int resource, Object... params) {
-
+		final Activity activity = Activities.getActual();
+		add(new ToastMessage(activity.getResources().getString(resource), SeverityType.INFO, params));
 	}
 
 	public void add(int resource, SeverityType severity, Object... params) {
-
+		final Activity activity = Activities.getActual();
+		add(new ToastMessage(activity.getResources().getString(resource), severity, params));
 	}
 
 	public List<Message> getMessages() {

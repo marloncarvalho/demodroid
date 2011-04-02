@@ -19,7 +19,7 @@ public interface MessageContext {
 	 * 
 	 * @param message
 	 */
-	void add(Message message, Object... params);
+	void add(Message message);
 
 	void add(String text, Object... params);
 

@@ -32,13 +32,10 @@ public class ConfigurationProcessor {
 	}
 
 	public void process(Object object) {
-		Field[] fields = Reflections.getNonStaticDeclaredFields(object
-				.getClass());
+		Field[] fields = Reflections.getNonStaticDeclaredFields(object.getClass());
 		for (Field field : fields) {
 			if (!field.isAnnotationPresent(Ignore.class)) {
-				String value = getProperties(
-						object.getClass().getAnnotation(Configuration.class)
-								.resource()).getProperty(field.getName());
+				String value = getProperties(object.getClass().getAnnotation(Configuration.class).resource()).getProperty(field.getName());
 				Reflections.setFieldValue(field, object, value);
 			}
 		}

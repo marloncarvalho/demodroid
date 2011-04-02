@@ -22,5 +22,5 @@ public class StringColumn extends MappedColumn {
 		String value = cursor.getString(index);
 		Reflections.setFieldValue(field, object, value);
 	}
-	
+
 }

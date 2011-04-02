@@ -5,7 +5,7 @@ import java.lang.reflect.Field;
 import javax.inject.Inject;
 
 public class SQLBuilder {
-	
+
 	@Inject
 	private PersistenceInspector entityHelper;
 
@@ -38,11 +38,10 @@ public class SQLBuilder {
 		if (cls.getSimpleName().toLowerCase().equals("integer") || cls.getSimpleName().toLowerCase().equals("boolean")) {
 			type = "INTEGER";
 		}
-		if (cls.getSimpleName().toLowerCase().equals("double")
-				|| cls.getSimpleName().toLowerCase().equals("float")) {
+		if (cls.getSimpleName().toLowerCase().equals("double") || cls.getSimpleName().toLowerCase().equals("float")) {
 			type = "REAL";
 		}
 		return type;
 	}
-	
+
 }

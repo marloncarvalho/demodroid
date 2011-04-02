@@ -3,7 +3,7 @@ package br.gov.frameworkdemoiselle.event;
 import android.database.sqlite.SQLiteDatabase;
 
 public class DatabaseUpgrade {
-	
+
 	/** SQLite database object that will be created. **/
 	private SQLiteDatabase database;
 

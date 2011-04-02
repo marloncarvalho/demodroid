@@ -22,7 +22,7 @@ public class SQLiteCrud<E> implements Crud<E> {
 
 	@Inject
 	private PersistenceInspector inspector;
-	
+
 	public SQLiteCrud() {
 		clasz = Reflections.getGenericTypeArgument(getClass(), 0);
 	}

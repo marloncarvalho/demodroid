@@ -31,8 +31,7 @@ final public class PersistenceInspector {
 		List<Field> list = new ArrayList<Field>();
 		for (Field field : cls.getDeclaredFields()) {
 			if (!field.isAnnotationPresent(Transient.class) && !field.isAnnotationPresent(Id.class)) {
-				if (field.getType().isPrimitive() || field.getType().equals(String.class)
-						|| field.getType().equals(Date.class)) {
+				if (field.getType().isPrimitive() || field.getType().equals(String.class) || field.getType().equals(Date.class)) {
 					if (!Modifier.isStatic(field.getModifiers())) {
 						list.add(field);
 					}
@@ -46,8 +45,7 @@ final public class PersistenceInspector {
 		List<Field> list = new ArrayList<Field>();
 		for (Field field : cls.getDeclaredFields()) {
 			if (!field.isAnnotationPresent(Transient.class)) {
-				if (field.getType().isPrimitive() || field.getType().equals(String.class)
-						|| field.getType().equals(Date.class)) {
+				if (field.getType().isPrimitive() || field.getType().equals(String.class) || field.getType().equals(Date.class)) {
 					if (!Modifier.isStatic(field.getModifiers())) {
 						list.add(field);
 					}

@@ -75,9 +75,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 		} else {
 			id = "0";
 		}
-		databaseHelper.getWritableDatabase()
-				.update(mappedEntity.getTableName(), createContentValues(mappedEntity, object, false),
-						idMappedColumn.getName() + "=? ", new String[] { id });
+		databaseHelper.getWritableDatabase().update(mappedEntity.getTableName(), createContentValues(mappedEntity, object, false), idMappedColumn.getName() + "=? ", new String[] { id });
 		if (!transaction.isActive()) {
 			close();
 		}
@@ -93,8 +91,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	@SuppressWarnings("unchecked")
 	public <T> T find(Class<T> clazz, Object primaryKey) throws SystemException {
 		MappedEntity mappedEntity = getMappedEntity(clazz);
-		Cursor cursor = databaseHelper.getWritableDatabase().query(mappedEntity.getTableName(), null, "id=?",
-				new String[] {}, null, null, null);
+		Cursor cursor = databaseHelper.getWritableDatabase().query(mappedEntity.getTableName(), null, "id=?", new String[] {}, null, null, null);
 
 		Object object = mappedEntity.instantiate();
 
@@ -139,8 +136,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 */
 	public void persist(Object object) throws SystemException {
 		MappedEntity mappedEntity = getMappedEntity(object.getClass());
-		long id = databaseHelper.getWritableDatabase().insertOrThrow(mappedEntity.getTableName(), null,
-				createContentValues(mappedEntity, object, false));
+		long id = databaseHelper.getWritableDatabase().insertOrThrow(mappedEntity.getTableName(), null, createContentValues(mappedEntity, object, false));
 		mappedEntity.getIdMappedColumn().setValue(object, id);
 		if (!transaction.isActive()) {
 			close();
@@ -164,8 +160,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 		} else {
 			id = "0";
 		}
-		databaseHelper.getWritableDatabase().delete(mappedEntity.getTableName(), idMappedColumn.getName() + "=? ",
-				new String[] { id });
+		databaseHelper.getWritableDatabase().delete(mappedEntity.getTableName(), idMappedColumn.getName() + "=? ", new String[] { id });
 		if (!transaction.isActive()) {
 			close();
 		}
@@ -179,8 +174,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 * .lang.String)
 	 */
 	public Query createQuery(Class<?> clazz, String query) {
-		return new QuerySQLiteImpl(query, getMappedEntity(clazz), databaseHelper.getReadableDatabase(),
-				!transaction.isActive());
+		return new QuerySQLiteImpl(query, getMappedEntity(clazz), databaseHelper.getReadableDatabase(), !transaction.isActive());
 	}
 
 	private MappedEntity getMappedEntity(Class<?> clasz) {
