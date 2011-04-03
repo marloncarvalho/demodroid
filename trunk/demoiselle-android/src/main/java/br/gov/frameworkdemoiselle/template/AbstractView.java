@@ -6,8 +6,6 @@ import br.gov.frameworkdemoiselle.activity.DemoiselleActivity;
 import br.gov.frameworkdemoiselle.event.AfterCreation;
 import br.gov.frameworkdemoiselle.event.BeforeCreation;
 import br.gov.frameworkdemoiselle.stereotype.UserView;
-import br.gov.frameworkdemoiselle.util.Beans;
-import br.gov.frameworkdemoiselle.util.Reflections;
 
 import com.google.inject.Inject;
 
@@ -25,7 +23,7 @@ abstract public class AbstractView<P extends AbstractPresenter> extends Demoisel
 		}
 	}
 
-	final public void registerPresenter(P presenter) {
+	protected void registerPresenter(P presenter) {
 		presenter.setView(this);
 	}
 
