@@ -32,7 +32,6 @@ public class Worker {
 	private String onExceptionMethod;
 	private Object onSuccessCaller;
 	private String onSuccessMethod;
-	private Object[] onSuccessParams;
 
 	/**
 	 * Default constructor.
@@ -65,10 +64,9 @@ public class Worker {
 		return this;
 	}
 
-	public Worker onSuccessCall(Object caller, String method, Object... callerParams) {
+	public Worker onSuccessCall(Object caller, String method) {
 		this.onSuccessCaller = caller;
 		this.onSuccessMethod = method;
-		this.onSuccessParams = callerParams;
 		return this;
 	}
 
@@ -105,9 +103,10 @@ public class Worker {
 			protected Void doInBackground(Void... params) {
 				try {
 
-					Log.d("Worker", "Calling [" + methodName + "] in object [" + caller + "] with params [" + callParams + "].");
+					Log.d("Worker", "Calling [" + methodName + "] in object [" + caller + "] with params ["
+							+ callParams + "].");
 
-					Reflections.callMethod(caller, methodName, callParams);
+					final Object result = Reflections.callMethod(caller, methodName, callParams);
 
 					Log.d("Worker", "Call Success.");
 
@@ -119,13 +118,13 @@ public class Worker {
 
 					// Call Success Method.
 					if (onSuccessCaller != null && onSuccessMethod != null && !"".equals(onSuccessMessage)) {
-						Log.d("Worker", "Calling Success Method [" + methodName + "] in object [" + caller + "] with params [" + callParams + "].");
+						Log.d("Worker", "Calling Success Method [" + methodName + "] in object [" + caller
+								+ "] with params [" + callParams + "].");
 
 						Activities.getActual().runOnUiThread(new Runnable() {
 
-							@Override
 							public void run() {
-								Reflections.callMethod(onSuccessCaller, onSuccessMethod, onSuccessParams);
+								Reflections.callMethod(onSuccessCaller, onSuccessMethod, new Object[] { result });
 							}
 
 						});
@@ -143,7 +142,8 @@ public class Worker {
 
 					// Call Exception Method.
 					if (onExceptionCaller != null && onExceptionMethod != null && !"".equals(onExceptionMessage)) {
-						Log.d("Worker", "Calling Exception Method [" + onExceptionMethod + "] in object [" + onExceptionCaller + "] with params [" + throwable + "].");
+						Log.d("Worker", "Calling Exception Method [" + onExceptionMethod + "] in object ["
+								+ onExceptionCaller + "] with params [" + throwable + "].");
 						callForException(throwable);
 						Log.d("Worker", "Exception Method Called with Success :)");
 					}
@@ -161,7 +161,7 @@ public class Worker {
 			final Throwable result = Reflections.findExceptionForMethodParameter(method, throwable);
 			if (result != null) {
 				Activities.getActual().runOnUiThread(new Runnable() {
-					@Override public void run() {
+					public void run() {
 						Reflections.callMethod(onExceptionCaller, onExceptionMethod, result);
 					}
 				});
