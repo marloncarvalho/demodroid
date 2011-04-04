@@ -2,15 +2,28 @@ package br.gov.frameworkdemoiselle.persistence;
 
 import java.util.List;
 
+/**
+ * Interface used to control query execution.
+ * 
+ * @author Marlon Silva Carvalho
+ * @since 1.0.0
+ */
 public interface Query {
 
-	void setMaxResults(int maxResults);
+	/**
+	 * Set the maximum number of results to retrieve.
+	 * 
+	 * @param maxResults
+	 */
+	Query setMaxResults(int maxResults);
 
-	void setParameter(int position, Object value);
+	Query setParameter(int position, Object value);
 
-	void setFirstResult(int firstResult);
+	Query setFirstResult(int firstResult);
 
 	List<?> getResultList();
+
+	List<?> getResultList(EntityLoadListener listener);
 
 	Object getRawResult();
 
