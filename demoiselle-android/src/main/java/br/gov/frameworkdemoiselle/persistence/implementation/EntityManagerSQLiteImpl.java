@@ -94,7 +94,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	public <T> T find(Class<T> clazz, Object primaryKey) throws SystemException {
 		MappedEntity mappedEntity = getMappedEntity(clazz);
 		Cursor cursor = databaseHelper.getWritableDatabase().query(mappedEntity.getTableName(), null, "id=?",
-				new String[] {}, null, null, null);
+				new String[] {primaryKey.toString()}, null, null, null);
 
 		Object object = mappedEntity.instantiate();
 
