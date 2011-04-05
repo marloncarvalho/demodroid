@@ -8,11 +8,13 @@ import br.gov.frameworkdemoiselle.util.Beans;
 
 import com.google.inject.Module;
 
+/**
+ * Start point for Demoiselle Applications.
+ * 
+ * @author Marlon Silva Carvalho
+ * @since 1.0.0
+ */
 public class DemoiselleApplication extends RoboApplication {
-
-	public DemoiselleApplication() {
-		super();
-	}
 
 	@Override
 	protected void addApplicationModules(List<Module> modules) {
