@@ -121,7 +121,7 @@ public class Worker {
 						Log.d("Worker", "Calling Success Method [" + methodName + "] in object [" + caller
 								+ "] with params [" + callParams + "].");
 
-						Activities.getActual().runOnUiThread(new Runnable() {
+						Activities.getCurrent().runOnUiThread(new Runnable() {
 
 							public void run() {
 								Reflections.callMethod(onSuccessCaller, onSuccessMethod, new Object[] { result });
@@ -160,7 +160,7 @@ public class Worker {
 		if (method != null) {
 			final Throwable result = Reflections.findExceptionForMethodParameter(method, throwable);
 			if (result != null) {
-				Activities.getActual().runOnUiThread(new Runnable() {
+				Activities.getCurrent().runOnUiThread(new Runnable() {
 					public void run() {
 						Reflections.callMethod(onExceptionCaller, onExceptionMethod, result);
 					}

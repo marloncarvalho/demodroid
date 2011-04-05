@@ -16,7 +16,7 @@ public class DateColumn extends MappedColumn {
 		String resValue = null;
 		Object value = getRawValue(object);
 
-		if (value != null && value instanceof Boolean) {
+		if (value != null && value instanceof Date) {
 			resValue = DateUtils.format((Date) value, DATE_FORMAT);
 		}
 

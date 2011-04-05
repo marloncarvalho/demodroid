@@ -18,7 +18,7 @@ public class DemoiselleActivity extends RoboActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
-		Activities.setActual(this);
+		Activities.setCurrent(this);
 	}
 
 }

@@ -23,7 +23,7 @@ public class ToasterMessageContextImpl implements MessageContext {
 	 * @see br.gov.frameworkdemoiselle.message.MessageContext#add(br.gov.frameworkdemoiselle.message.Message, java.lang.Object[])
 	 */
 	public void add(final Message message) {
-		final Activity activity = Activities.getActual();
+		final Activity activity = Activities.getCurrent();
 		activity.runOnUiThread(new Runnable() {
 
 			public void run() {
@@ -51,12 +51,12 @@ public class ToasterMessageContextImpl implements MessageContext {
 	}
 
 	public void add(int resource, Object... params) {
-		final Activity activity = Activities.getActual();
+		final Activity activity = Activities.getCurrent();
 		add(new ToastMessage(activity.getResources().getString(resource), SeverityType.INFO, params));
 	}
 
 	public void add(int resource, SeverityType severity, Object... params) {
-		final Activity activity = Activities.getActual();
+		final Activity activity = Activities.getCurrent();
 		add(new ToastMessage(activity.getResources().getString(resource), severity, params));
 	}
 
