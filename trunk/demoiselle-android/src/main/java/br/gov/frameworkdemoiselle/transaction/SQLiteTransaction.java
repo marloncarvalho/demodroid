@@ -1,5 +1,6 @@
 package br.gov.frameworkdemoiselle.transaction;
 
+import android.util.Log;
 import br.gov.frameworkdemoiselle.internal.exception.SystemException;
 import br.gov.frameworkdemoiselle.internal.persistence.sqlite.SQLiteDatabaseHelper;
 
@@ -9,7 +10,7 @@ import com.google.inject.Singleton;
 /**
  * Responsible to manage transactions using SQLite.
  * 
- * @author marlonsilvacarvalho
+ * @author Marlon Silva Carvalho
  * @since 1.0.0
  */
 @Singleton
@@ -43,6 +44,7 @@ public class SQLiteTransaction implements Transaction {
 	 * @see br.gov.frameworkdemoiselle.transaction.Transaction#begin()
 	 */
 	public void begin() throws SystemException {
+		Log.w("SQLiteTransaction", "Initializing Transaction!");
 		databaseHelper.getWritableDatabase().beginTransaction();
 	}
 
@@ -52,6 +54,7 @@ public class SQLiteTransaction implements Transaction {
 	 * @see br.gov.frameworkdemoiselle.transaction.Transaction#commit()
 	 */
 	public void commit() throws SystemException {
+		Log.w("SQLiteTransaction", "Commiting Transaction!");
 		databaseHelper.getWritableDatabase().setTransactionSuccessful();
 		databaseHelper.getWritableDatabase().endTransaction();
 
@@ -66,6 +69,7 @@ public class SQLiteTransaction implements Transaction {
 	 * @see br.gov.frameworkdemoiselle.transaction.Transaction#rollback()
 	 */
 	public void rollback() throws SystemException {
+		Log.w("SQLiteTransaction", "Rolling back Transaction!");
 		databaseHelper.getWritableDatabase().endTransaction();
 		databaseHelper.getWritableDatabase().close();
 	}
@@ -83,6 +87,7 @@ public class SQLiteTransaction implements Transaction {
 			result = inTransaction.execute();
 			commit();
 		} catch (Throwable throwable) {
+			Log.w("SQLiteTransaction", "Exception thrown! Need to rollback transaction.");
 			rollback();
 			throw new RuntimeException(throwable);
 		}
