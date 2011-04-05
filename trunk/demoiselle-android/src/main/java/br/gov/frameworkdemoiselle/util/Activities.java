@@ -4,22 +4,22 @@ import android.app.Activity;
 
 final public class Activities {
 
-	private static Activity actual;
+	private static Activity current;
 
 	private Activities() {
 	}
 
-	public static Activity getActual() {
-		return actual;
+	public static Activity getCurrent() {
+		return current;
 	}
 
-	public static void setActual(Activity actitivy) {
-		actual = actitivy;
+	public static void setCurrent(Activity actitivy) {
+		current = actitivy;
 	}
 
 	public static void run(Runnable runnable) {
-		if (actual != null) {
-			actual.runOnUiThread(runnable);
+		if (current != null) {
+			current.runOnUiThread(runnable);
 		}
 	}
 
