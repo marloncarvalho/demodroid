@@ -15,13 +15,13 @@ import br.gov.frameworkdemoiselle.internal.persistence.SQLBuilder;
 import br.gov.frameworkdemoiselle.util.Dex;
 
 import com.google.inject.Inject;
+import com.google.inject.Provider;
 import com.google.inject.Singleton;
 
 @Singleton
 public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 	private static final String DATABASE = "DATABASE";
 	private static final String VERSION = "VERSION";
-	private Context context;
 
 	@Inject
 	private SQLBuilder sqlBuilder;
@@ -29,12 +29,15 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 	@Inject
 	private EventManager eventManager;
 
+	private Provider<Context> contextProvider;
+
 	private SQLiteDatabase cachedDatabase;
 
 	@Inject
-	public SQLiteDatabaseHelper(Context context) {
-		super(context, getDatabaseName(context), null, getDatabaseVersion(context));
-		this.context = context;
+	public SQLiteDatabaseHelper(final Provider<Context> contextProvider) {
+		super(contextProvider.get(), getDatabaseName(contextProvider.get()), null, getDatabaseVersion(contextProvider
+				.get()));
+		this.contextProvider = contextProvider;
 	}
 
 	@Override
@@ -48,15 +51,15 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	public void onCreate(SQLiteDatabase db) {
-		eventManager.fire(new DatabaseCreation(db));
-		ArrayList<Class<?>> tables = Dex.getEntities(this.context);
+		eventManager.fire(contextProvider.get(), new DatabaseCreation(db));
+		ArrayList<Class<?>> tables = Dex.getEntities(contextProvider.get());
 		for (Class<?> table : tables) {
 			db.execSQL(sqlBuilder.buildCreateTable(table));
 		}
 	}
 
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		eventManager.fire(new DatabaseUpgrade(db, oldVersion, newVersion));
+		eventManager.fire(contextProvider.get(), new DatabaseUpgrade(db, oldVersion, newVersion));
 	}
 
 	private static String getDatabaseName(Context context) {
