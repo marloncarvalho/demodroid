@@ -1,6 +1,6 @@
 package br.gov.frameworkdemoiselle.internal.persistence.sqlite;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import roboguice.event.EventManager;
 import android.content.Context;
@@ -12,6 +12,7 @@ import android.util.Log;
 import br.gov.frameworkdemoiselle.event.DatabaseCreation;
 import br.gov.frameworkdemoiselle.event.DatabaseUpgrade;
 import br.gov.frameworkdemoiselle.internal.persistence.SQLBuilder;
+import br.gov.frameworkdemoiselle.persistence.DatabaseUpgrader;
 import br.gov.frameworkdemoiselle.util.Dex;
 
 import com.google.inject.Inject;
@@ -52,7 +53,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
 	public void onCreate(SQLiteDatabase db) {
 		eventManager.fire(contextProvider.get(), new DatabaseCreation(db));
-		ArrayList<Class<?>> tables = Dex.getEntities(contextProvider.get());
+		List<Class<?>> tables = Dex.getEntities(contextProvider.get());
 		for (Class<?> table : tables) {
 			db.execSQL(sqlBuilder.buildCreateTable(table));
 		}
@@ -60,6 +61,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		eventManager.fire(contextProvider.get(), new DatabaseUpgrade(db, oldVersion, newVersion));
+		DatabaseUpgrader.executeUpgraders(db, oldVersion, newVersion);
 	}
 
 	private static String getDatabaseName(Context context) {
