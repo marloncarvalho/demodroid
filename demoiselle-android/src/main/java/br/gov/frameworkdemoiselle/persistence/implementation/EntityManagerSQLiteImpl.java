@@ -179,7 +179,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 * .lang.String)
 	 */
 	public Query createQuery(Class<?> clazz, String query) {
-		return new QuerySQLiteImpl(query, getMappedEntity(clazz), databaseHelper.getReadableDatabase(),
+		return new QuerySQLiteImpl(query, getMappedEntity(clazz), databaseHelper.getWritableDatabase(),
 				!transaction.isActive());
 	}
 

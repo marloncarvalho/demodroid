@@ -21,8 +21,8 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
-	private static final String DATABASE = "DATABASE";
-	private static final String VERSION = "VERSION";
+	private static final String DATABASE = "DATABASE_NAME";
+	private static final String VERSION = "DATABASE_VERSION";
 
 	@Inject
 	private SQLBuilder sqlBuilder;
@@ -36,8 +36,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
 	@Inject
 	public SQLiteDatabaseHelper(final Provider<Context> contextProvider) {
-		super(contextProvider.get(), getDatabaseName(contextProvider.get()), null, getDatabaseVersion(contextProvider
-				.get()));
+		super(contextProvider.get(), getDatabaseName(contextProvider.get()), null, getDatabaseVersion(contextProvider.get()));
 		this.contextProvider = contextProvider;
 	}
 
