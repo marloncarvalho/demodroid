@@ -1,6 +1,7 @@
 package br.gov.frameworkdemoiselle.util;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 
 /**
@@ -12,7 +13,7 @@ import android.content.Intent;
 public class ServiceStarter {
 
 	public static void start(final Class<?> clasz) {
-		Activity activity = Activities.getCurrent();
+		Activity activity = (Activity) Beans.getBean(Context.class);
 		Intent intent = new Intent(activity, clasz);
 		activity.startService(intent);
 	}
