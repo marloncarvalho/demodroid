@@ -1,7 +1,11 @@
 package br.gov.frameworkdemoiselle.activity;
 
-import br.gov.frameworkdemoiselle.util.Activities;
 import roboguice.activity.RoboActivity;
+import roboguice.event.EventManager;
+import br.gov.frameworkdemoiselle.event.AfterStart;
+import br.gov.frameworkdemoiselle.util.Activities;
+
+import com.google.inject.Inject;
 
 /**
  * Extends from ${link RoboActivity} adding specific behavior from Demoiselle framework.
@@ -11,6 +15,9 @@ import roboguice.activity.RoboActivity;
  */
 public class DemoiselleActivity extends RoboActivity {
 
+	@Inject
+	private EventManager eventManager;
+
 	/**
 	 * Overrides adding specific behavior.
 	 * Saves the actual Activity being viewd.
@@ -19,6 +26,7 @@ public class DemoiselleActivity extends RoboActivity {
 	protected void onStart() {
 		super.onStart();
 		Activities.setCurrent(this);
+		eventManager.fire(new AfterStart());
 	}
 
 }
