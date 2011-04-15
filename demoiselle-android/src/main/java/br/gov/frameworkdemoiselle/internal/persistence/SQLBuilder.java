@@ -9,16 +9,16 @@ import br.gov.frameworkdemoiselle.persistence.annotation.Column;
 public class SQLBuilder {
 
 	@Inject
-	private PersistenceInspector entityHelper;
+	private PersistenceInspector persistenceInspector;
 
 	public String buildCreateTable(Class<?> cls) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("CREATE TABLE  ");
-		sql.append(entityHelper.getTableName(cls));
+		sql.append(persistenceInspector.getTableName(cls));
 		sql.append(" (");
-		sql.append(entityHelper.getIdField(cls).getName());
+		sql.append(persistenceInspector.getIdField(cls).getName());
 		sql.append(" INTEGER PRIMARY KEY, ");
-		for (Field field : entityHelper.getPersistentFields(cls)) {
+		for (Field field : persistenceInspector.getPersistentFields(cls)) {
 			sql.append(field.getName());
 			sql.append(" ");
 			sql.append(getType(field));
