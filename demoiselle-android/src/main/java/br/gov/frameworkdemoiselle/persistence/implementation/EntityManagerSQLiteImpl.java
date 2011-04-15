@@ -47,7 +47,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	@Inject
 	private Transaction transaction;
 
-	private Map<Class<?>, MappedEntity> cached = new WeakHashMap<Class<?>, MappedEntity>();
+	public static Map<Class<?>, MappedEntity> cached = new WeakHashMap<Class<?>, MappedEntity>();
 
 	/*
 	 * (non-Javadoc)

@@ -2,26 +2,23 @@ package br.gov.frameworkdemoiselle.internal.persistence;
 
 import java.lang.reflect.Field;
 
-import javax.inject.Inject;
-
 import br.gov.frameworkdemoiselle.persistence.annotation.Column;
+import br.gov.frameworkdemoiselle.persistence.implementation.EntityManagerSQLiteImpl;
 
 public class SQLBuilder {
 
-	@Inject
-	private PersistenceInspector persistenceInspector;
-
 	public String buildCreateTable(Class<?> cls) {
+		MappedEntity mappedEntity = EntityManagerSQLiteImpl.cached.get(cls);
 		StringBuilder sql = new StringBuilder();
 		sql.append("CREATE TABLE  ");
-		sql.append(persistenceInspector.getTableName(cls));
+		sql.append(mappedEntity.getTableName());
 		sql.append(" (");
-		sql.append(persistenceInspector.getIdField(cls).getName());
+		sql.append(mappedEntity.getIdMappedColumn().getName());
 		sql.append(" INTEGER PRIMARY KEY, ");
-		for (Field field : persistenceInspector.getPersistentFields(cls)) {
-			sql.append(field.getName());
+		for (MappedColumn mappedColumn : mappedEntity.getMappedColumns().values()) {
+			sql.append(mappedColumn.getName());
 			sql.append(" ");
-			sql.append(getType(field));
+			sql.append(getType(mappedColumn.getField()));
 			sql.append(", ");
 		}
 		sql.delete(sql.length() - 2, sql.length());
