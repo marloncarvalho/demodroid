@@ -57,6 +57,9 @@ public class MappedEntity {
 				}
 			}
 		}
+		if (idMappedColumn == null) {
+			throw new RuntimeException("No ID column defined for Entity (" + this.getMappedClass() + "). Use @Id annotation.");
+		}
 		return idMappedColumn;
 	}
 }
