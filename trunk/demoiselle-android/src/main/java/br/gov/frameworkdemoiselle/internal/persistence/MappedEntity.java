@@ -26,7 +26,7 @@ public class MappedEntity {
 		if (mappedClass.isAnnotationPresent(Table.class)) {
 			table = mappedClass.getAnnotation(Table.class).name();
 		} else {
-			table = mappedClass.getName().toLowerCase();
+			table = mappedClass.getSimpleName().toLowerCase();
 		}
 
 		return table;
