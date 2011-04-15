@@ -90,7 +90,7 @@ final public class PersistenceInspector {
 		if (cls.isAnnotationPresent(Table.class)) {
 			tableName = cls.getAnnotation(Table.class).name();
 		} else {
-			tableName = cls.getSimpleName().toLowerCase();
+			tableName = cls.getCanonicalName().toLowerCase();
 		}
 		return tableName;
 	}
