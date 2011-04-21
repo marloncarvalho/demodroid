@@ -49,6 +49,15 @@ public class Strings {
 		return Pattern.matches("^\\{(.+)\\}$", key == null ? "" : key);
 	}
 
+	public static String trocarCaracteresAcentuados(String frase) {
+		if (frase == null)
+			return frase;
+		return frase.replaceAll("[ãâàáä]", "a").replaceAll("[êèéë]", "e").replaceAll("[îìíïĩ]", "i")
+				.replaceAll("[õôòóö]", "o").replaceAll("[ûúùüũ]", "u").replaceAll("[ÃÂÀÁÄ]", "A")
+				.replaceAll("[ÊÈÉË]", "E").replaceAll("[ÎÌÍĨÏ]", "I").replaceAll("[ÕÔÒÓÖ]", "O")
+				.replaceAll("[ÛÙÚŨÜ]", "U").replace('ç', 'c').replace('Ç', 'C').replace('ñ', 'n').replace('Ñ', 'N');
+	}
+
 	public static String getString(final String string, final Object... params) {
 		String result = null;
 
@@ -91,7 +100,8 @@ public class Strings {
 					result.append(field.getName());
 					result.append("=");
 					fieldValue = Reflections.getFieldValue(field, object);
-					result.append(fieldValue != null && fieldValue.getClass().isArray() ? Arrays.toString((Object[]) fieldValue) : fieldValue);
+					result.append(fieldValue != null && fieldValue.getClass().isArray() ? Arrays
+							.toString((Object[]) fieldValue) : fieldValue);
 				}
 			}
 
