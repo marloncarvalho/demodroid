@@ -19,4 +19,14 @@ final public class Number {
 		}
 		return result;
 	}
+	
+	static public double parseToDouble(String num) {
+		double result = 0;
+		try {
+			result = Double.valueOf(num);
+		} catch (Throwable t) {
+		}
+		return result;
+	}
+
 }
