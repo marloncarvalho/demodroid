@@ -55,9 +55,10 @@ public class SQLiteTransaction implements Transaction {
 	 */
 	public void commit() throws SystemException {
 		Log.w("SQLiteTransaction", "Commiting Transaction!");
-		databaseHelper.getWritableDatabase().setTransactionSuccessful();
-		databaseHelper.getWritableDatabase().endTransaction();
-
+		if (databaseHelper.getWritableDatabase().inTransaction()) {
+			databaseHelper.getWritableDatabase().setTransactionSuccessful();
+			databaseHelper.getWritableDatabase().endTransaction();
+		}
 		if (!databaseHelper.getWritableDatabase().inTransaction()) {
 			databaseHelper.getWritableDatabase().close();
 		}
@@ -70,8 +71,12 @@ public class SQLiteTransaction implements Transaction {
 	 */
 	public void rollback() throws SystemException {
 		Log.w("SQLiteTransaction", "Rolling back Transaction!");
-		databaseHelper.getWritableDatabase().endTransaction();
-		databaseHelper.getWritableDatabase().close();
+		if (databaseHelper.getWritableDatabase().inTransaction()) {
+			databaseHelper.getWritableDatabase().endTransaction();
+		}
+		if (!databaseHelper.getWritableDatabase().inTransaction()) {
+			databaseHelper.getWritableDatabase().close();
+		}
 	}
 
 	/*
