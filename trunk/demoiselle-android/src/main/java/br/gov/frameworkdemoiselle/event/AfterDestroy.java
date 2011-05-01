@@ -1,5 +1,5 @@
 package br.gov.frameworkdemoiselle.event;
 
-public class ProcessActivityDestroy {
+public class AfterDestroy {
 
 }

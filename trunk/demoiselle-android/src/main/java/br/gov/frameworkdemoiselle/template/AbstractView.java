@@ -4,6 +4,8 @@ import roboguice.event.EventManager;
 import android.os.Bundle;
 import br.gov.frameworkdemoiselle.activity.DemoiselleActivity;
 import br.gov.frameworkdemoiselle.event.AfterCreation;
+import br.gov.frameworkdemoiselle.event.AfterDestroy;
+import br.gov.frameworkdemoiselle.event.AfterPause;
 import br.gov.frameworkdemoiselle.event.BeforeCreation;
 import br.gov.frameworkdemoiselle.stereotype.UserView;
 
@@ -35,6 +37,18 @@ abstract public class AbstractView<P extends AbstractPresenter> extends Demoisel
 		eventManager.fire(this, new BeforeCreation());
 		processCreation(savedInstanceState);
 		eventManager.fire(this, new AfterCreation());
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		eventManager.fire(this, new AfterPause());
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		eventManager.fire(this, new AfterDestroy());
 	}
 
 	protected abstract void processCreation(Bundle savedInstanceState);
