@@ -32,6 +32,7 @@ abstract public class AbstractView<P extends AbstractPresenter> extends Demoisel
 	@Override
 	final protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		this.beforeCreation(savedInstanceState);
 		setContentView(contentView);
 
 		eventManager.fire(this, new BeforeCreation());
@@ -51,6 +52,7 @@ abstract public class AbstractView<P extends AbstractPresenter> extends Demoisel
 		eventManager.fire(this, new AfterDestroy());
 	}
 
+	protected void beforeCreation(Bundle savedInstanceState) {}
 	protected abstract void processCreation(Bundle savedInstanceState);
 
 }
