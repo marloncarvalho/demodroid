@@ -2,6 +2,7 @@ package br.gov.frameworkdemoiselle.util;
 
 import java.lang.reflect.Method;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
@@ -81,30 +82,24 @@ public class Worker {
 		return this;
 	}
 
-	/**
-	 * Fire the Task!
-	 */
-	public void execute(final Context context, final String dialogTitle, final String dialogBody) {
+	public void execute(final Context context) {
 		new AsyncTask<Void, Void, Void>() {
-
-			private ProgressDialog dialog;
 
 			@Override
 			protected void onPreExecute() {
-				dialog = ProgressDialog.show(context, dialogTitle, dialogBody);
+				((Activity) context).setProgressBarIndeterminateVisibility(true);
 			}
 
 			@Override
 			protected void onPostExecute(Void result) {
-				dialog.dismiss();
+				((Activity) context).setProgressBarIndeterminateVisibility(false);
 			}
 
 			@Override
 			protected Void doInBackground(Void... params) {
 				try {
 
-					Log.d("Worker", "Calling [" + methodName + "] in object [" + caller + "] with params ["
-							+ callParams + "].");
+					Log.d("Worker", "Calling [" + methodName + "] in object [" + caller + "] with params [" + callParams + "].");
 
 					final Object result = Reflections.callMethod(caller, methodName, callParams);
 
@@ -118,8 +113,7 @@ public class Worker {
 
 					// Call Success Method.
 					if (onSuccessCaller != null && onSuccessMethod != null && !"".equals(onSuccessMessage)) {
-						Log.d("Worker", "Calling Success Method [" + methodName + "] in object [" + caller
-								+ "] with params [" + callParams + "].");
+						Log.d("Worker", "Calling Success Method [" + methodName + "] in object [" + caller + "] with params [" + callParams + "].");
 
 						Activities.getCurrent().runOnUiThread(new Runnable() {
 
@@ -142,8 +136,78 @@ public class Worker {
 
 					// Call Exception Method.
 					if (onExceptionCaller != null && onExceptionMethod != null && !"".equals(onExceptionMessage)) {
-						Log.d("Worker", "Calling Exception Method [" + onExceptionMethod + "] in object ["
-								+ onExceptionCaller + "] with params [" + throwable + "].");
+						Log.d("Worker", "Calling Exception Method [" + onExceptionMethod + "] in object [" + onExceptionCaller + "] with params [" + throwable + "].");
+						callForException(throwable);
+						Log.d("Worker", "Exception Method Called with Success :)");
+					}
+
+				}
+				return null;
+			}
+
+		}.execute();
+	}
+
+	/**
+	 * Fire the Task!
+	 */
+	public void execute(final Context context, final String dialogTitle, final String dialogBody) {
+		new AsyncTask<Void, Void, Void>() {
+
+			private ProgressDialog dialog;
+
+			@Override
+			protected void onPreExecute() {
+				dialog = ProgressDialog.show(context, dialogTitle, dialogBody);
+			}
+
+			@Override
+			protected void onPostExecute(Void result) {
+				dialog.dismiss();
+			}
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				try {
+
+					Log.d("Worker", "Calling [" + methodName + "] in object [" + caller + "] with params [" + callParams + "].");
+
+					final Object result = Reflections.callMethod(caller, methodName, callParams);
+
+					Log.d("Worker", "Call Success.");
+
+					// Show Success Message.
+					if (onSuccessMessage != null && !"".equals(onSuccessMessage)) {
+						Log.d("Worker", "Showing Success Message [" + onSuccessMessage + "];");
+						messageContext.add(onSuccessMessage);
+					}
+
+					// Call Success Method.
+					if (onSuccessCaller != null && onSuccessMethod != null && !"".equals(onSuccessMessage)) {
+						Log.d("Worker", "Calling Success Method [" + methodName + "] in object [" + caller + "] with params [" + callParams + "].");
+
+						Activities.getCurrent().runOnUiThread(new Runnable() {
+
+							public void run() {
+								Reflections.callMethod(onSuccessCaller, onSuccessMethod, new Object[] { result });
+							}
+
+						});
+
+						Log.d("Worker", "Success Method Called with Success :)");
+					}
+
+				} catch (final Throwable throwable) {
+
+					// Show Exception Message.
+					if (onExceptionMessage != null && !"".equals(onExceptionMessage)) {
+						Log.d("Worker", "Showing Exception Message [" + onExceptionMessage + "];");
+						messageContext.add(onExceptionMessage, SeverityType.ERROR);
+					}
+
+					// Call Exception Method.
+					if (onExceptionCaller != null && onExceptionMethod != null && !"".equals(onExceptionMessage)) {
+						Log.d("Worker", "Calling Exception Method [" + onExceptionMethod + "] in object [" + onExceptionCaller + "] with params [" + throwable + "].");
 						callForException(throwable);
 						Log.d("Worker", "Exception Method Called with Success :)");
 					}
