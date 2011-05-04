@@ -55,7 +55,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 * @see br.gov.frameworkdemoiselle.persistence.EntityManager#close()
 	 */
 	public void close() throws SystemException {
-		databaseHelper.getWritableDatabase().close();
+		databaseHelper.close();
 	}
 
 	/*
@@ -174,7 +174,7 @@ public class EntityManagerSQLiteImpl implements EntityManager {
 	 * .lang.String)
 	 */
 	public Query createQuery(Class<?> clazz, String query) {
-		return new QuerySQLiteImpl(query, getMappedEntity(clazz), databaseHelper.getWritableDatabase(), !transaction.isActive());
+		return new QuerySQLiteImpl(query, getMappedEntity(clazz), databaseHelper, !transaction.isActive());
 	}
 
 	private MappedEntity getMappedEntity(Class<?> clasz) {

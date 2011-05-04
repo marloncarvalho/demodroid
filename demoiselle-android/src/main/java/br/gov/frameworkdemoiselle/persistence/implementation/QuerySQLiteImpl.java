@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import br.gov.frameworkdemoiselle.internal.persistence.MappedColumn;
 import br.gov.frameworkdemoiselle.internal.persistence.MappedEntity;
+import br.gov.frameworkdemoiselle.internal.persistence.sqlite.SQLiteDatabaseHelper;
 import br.gov.frameworkdemoiselle.persistence.EntityLoadListener;
 import br.gov.frameworkdemoiselle.persistence.Query;
 
@@ -20,13 +20,13 @@ import br.gov.frameworkdemoiselle.persistence.Query;
  * @since 1.0.0
  */
 public class QuerySQLiteImpl implements Query {
-	private SQLiteDatabase database;
 	private int maxResults;
 	private int firstResult = 0;
 	private String query;
 	private Map<Integer, Object> args = new HashMap<Integer, Object>();
 	private MappedEntity mappedEntity;
 	private boolean closeable = false;
+	private SQLiteDatabaseHelper helper;
 
 	/**
 	 * Default constructor.
@@ -36,11 +36,11 @@ public class QuerySQLiteImpl implements Query {
 	 * @param database SQLite database object.
 	 * @param closeable If the database must be closed after all.
 	 */
-	public QuerySQLiteImpl(String query, MappedEntity mappedEntity, SQLiteDatabase database, boolean closeable) {
-		this.database = database;
+	public QuerySQLiteImpl(String query, MappedEntity mappedEntity, SQLiteDatabaseHelper helper, boolean closeable) {
 		this.query = query;
 		this.mappedEntity = mappedEntity;
 		this.closeable = closeable;
+		this.helper = helper;
 	}
 
 	/*
@@ -90,7 +90,7 @@ public class QuerySQLiteImpl implements Query {
 		}
 		cursor.close();
 		if (closeable) {
-			database.close();
+			helper.close();
 		}
 		return resultList;
 	}
@@ -107,7 +107,7 @@ public class QuerySQLiteImpl implements Query {
 		if (maxResults > 0) {
 			query = query + " LIMIT " + firstResult + "," + maxResults;
 		}
-		Cursor cursor = database.rawQuery(query, selectionArgs);
+		Cursor cursor = helper.getWritableDatabase().rawQuery(query, selectionArgs);
 		return cursor;
 	}
 
@@ -120,9 +120,9 @@ public class QuerySQLiteImpl implements Query {
 		for (Integer position : args.keySet()) {
 			selectionArgs[position] = args.get(position).toString();
 		}
-		database.execSQL(query, selectionArgs);
+		helper.getWritableDatabase().execSQL(query, selectionArgs);
 		if (closeable) {
-			database.close();
+			helper.close();
 		}
 		return 0;
 	}
@@ -148,7 +148,7 @@ public class QuerySQLiteImpl implements Query {
 		}
 		cursor.close();
 		if (closeable) {
-			database.close();
+			helper.close();
 		}
 		return resultList;
 	}
