@@ -94,6 +94,7 @@ public class SQLiteTransaction implements Transaction {
 		} catch (Throwable throwable) {
 			Log.w("SQLiteTransaction", "Exception thrown! Need to rollback transaction.");
 			rollback();
+			throw new RuntimeException(throwable);
 		}
 		return result;
 	}
