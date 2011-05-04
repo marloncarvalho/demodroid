@@ -34,6 +34,8 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
 	private SQLiteDatabase cachedDatabase;
 
+	private int count = 0;
+
 	@Inject
 	public SQLiteDatabaseHelper(final Provider<Context> contextProvider) {
 		super(contextProvider.get(), getDatabaseName(contextProvider.get()), null, getDatabaseVersion(contextProvider.get()));
@@ -47,7 +49,15 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 		} else if (!cachedDatabase.isOpen()) {
 			cachedDatabase = super.getWritableDatabase();
 		}
+		count++;
 		return cachedDatabase;
+	}
+
+	public void close() {
+		count--;
+		if (count == 0) {
+			super.close();
+		}
 	}
 
 	public void onCreate(SQLiteDatabase db) {
