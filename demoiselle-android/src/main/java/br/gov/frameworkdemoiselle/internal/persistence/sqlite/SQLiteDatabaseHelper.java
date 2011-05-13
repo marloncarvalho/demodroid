@@ -38,8 +38,7 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 
 	@Inject
 	public SQLiteDatabaseHelper(final Provider<Context> contextProvider) {
-		super(contextProvider.get(), getDatabaseName(contextProvider.get()), null, getDatabaseVersion(contextProvider
-				.get()));
+		super(contextProvider.get(), getDatabaseName(contextProvider.get()), null, getDatabaseVersion(contextProvider.get()));
 		this.contextProvider = contextProvider;
 	}
 
@@ -58,7 +57,9 @@ public class SQLiteDatabaseHelper extends SQLiteOpenHelper {
 		count--;
 		if (count <= 0) {
 			count = 0;
-			super.close();
+			if (cachedDatabase.isOpen()) {
+				super.close();
+			}
 		}
 	}
 
