@@ -3,14 +3,12 @@ package br.gov.frameworkdemoiselle.task;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.vidageek.mirror.dsl.Mirror;
-
-import br.gov.frameworkdemoiselle.util.Strings;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.widget.Toast;
+import br.gov.frameworkdemoiselle.util.Reflections;
+import br.gov.frameworkdemoiselle.util.Strings;
 
 /**
  * Utility class which create a simple DSL to execute async tasks.
@@ -33,6 +31,7 @@ final public class Async {
 	public void execute() {
 		new AsyncTask<Object, Void, Object>() {
 			private ProgressDialog progressDialog;
+			private boolean success = true;
 
 			protected void onPreExecute() {
 				if (during != null) {
@@ -48,6 +47,17 @@ final public class Async {
 				if (progressDialog != null) {
 					progressDialog.dismiss();
 				}
+				if (success) {
+					for (SuccessImpl success : successes) {
+						showToast(success.getMessage(), success.getDuration());
+						invoke(success.getObject(), success.getMethod(), success.getArgs());
+					}
+				} else {
+					for (CrashImpl crash : crashes) {
+						showToast(crash.getMessage(), crash.getDuration());
+						invoke(crash.getObject(), crash.getMethod(), crash.getArgs());
+					}
+				}
 				for (AfterImpl after : afters) {
 					showToast(after.getMessage(), after.getDuration());
 					if (after.isResultAsArg()) {
@@ -62,17 +72,10 @@ final public class Async {
 			protected Object doInBackground(Object... params) {
 				Object result = null;
 				try {
-					result = new Mirror().on(mainCallable.getObject()).invoke().method(mainCallable.getMethod());
+					result = Reflections.callMethod(mainCallable.getObject(), mainCallable.getMethod(),
+							mainCallable.getArgs());
 				} catch (Throwable throwable) {
-					for (CrashImpl crash : crashes) {
-						showToast(crash.getMessage(), crash.getDuration());
-						invoke(crash.getObject(), crash.getMethod(), crash.getArgs());
-					}
-					throw new RuntimeException(throwable);
-				}
-				for (SuccessImpl success : successes) {
-					showToast(success.getMessage(), success.getDuration());
-					invoke(success.getObject(), success.getMethod(), success.getArgs());
+					success = false;
 				}
 				return result;
 			}
@@ -83,10 +86,11 @@ final public class Async {
 	private Object invoke(Object object, String method, Object... args) {
 		Object result = null;
 		if (!Strings.isEmpty(method) && object != null) {
+
 			if (args != null && args.length > 0) {
-				result = new Mirror().on(object).invoke().method(method).withArgs(args);
+				result = Reflections.callMethod(object, method, args);
 			} else {
-				result = new Mirror().on(object).invoke().method(method).withoutArgs();
+				result = Reflections.callMethod(object, method);
 			}
 		}
 		return result;
@@ -122,7 +126,7 @@ final public class Async {
 		return before;
 	}
 
-	public Occurring ocurring() {
+	public Occurring occurring() {
 		Occurring o = new Occurring() {
 
 			public Crash crash() {
