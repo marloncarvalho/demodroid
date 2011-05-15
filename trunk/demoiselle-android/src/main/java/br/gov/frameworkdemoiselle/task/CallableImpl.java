@@ -16,6 +16,7 @@ public class CallableImpl implements Callable {
 		this.method = method;
 		Reflectable mirror = new Reflectable() {
 			public Result on(Object object) {
+				CallableImpl.this.object = object;
 				Result result = new Result() {
 
 					public Async withResultAsArg() {
